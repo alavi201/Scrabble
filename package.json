@@ -7,7 +7,8 @@
     "start:dev": "DEBUG=term-project-667-project-alavi-chalke-mazumdar:* nodemon ./bin/www",
     "db:create:migration": "sequelize migration:generate --name ",
     "db:migrate": "sequelize db:migrate",
-    "db:rollback": "sequelize db:migrate:undo"
+    "db:rollback": "sequelize db:migrate:undo",
+    "postinstall": "sequelize db:migrate"
   },
   "dependencies": {
     "body-parser": "~1.18.2",
