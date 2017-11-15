@@ -5,8 +5,36 @@ block content
   p Welcome to #{title}
 
   .container-fluid
-    .col
-      .col-sm-9.
-        Game
-      .col-sm-3.
-        Chat
+    .col-sm-9.
+      Game
+      
+    .col-sm-3.
+      Chat <br/>
+
+    <br/>
+    <br/>
+    <br/>
+    
+    ul#messages
+  
+    form()
+      input#m(type='text', placeholder='first and last' name='name')
+      button.btn(type='submit') Send
+
+  script(src='/socket.io/socket.io.js')
+  script.
+    const socket = io();
+    $(function () {
+      socket.on('chat message', function(msg){
+        $('#messages').append($('<li>').text(msg));
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      $('form').submit(function(e){
+        e.preventDefault();
+        socket.emit('chat message', $('#m').val());
+        $('#m').val('');
+        return false;
+      });
+
+    });
