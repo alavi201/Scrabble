@@ -4,22 +4,44 @@ block content
   h1= title
   p Welcome to #{title}
 
-  .container-fluid
-    .col-sm-9.
-      Game
-      
-    .col-sm-3.
-      Chat <br/>
+  div.container-fluid.col-sm-12
+    div.col-sm-9
+      table
+        tbody
+          each val in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+            tr
+              each val in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+                td  &nbsp; 
 
-    <br/>
-    <br/>
-    <br/>
+      br
+      br
+      h4 My Score: 34
+      table
+        thead
+          tr
+            th.rack.head(colspan='7') Rack
+        tbody
+          tr
+            each val in ['A', 'B', 'V', 'Z', 'Q', '', 'E']
+              td.rack= val
+      br
+
+      div.col-sm-9
+        button.col-sm-3 Play
+        button.col-sm-3 Swap
+        button.col-sm-3 Pass
+
+    div.col-sm-3
+      div
+        h3 Remaining Tiles: 56
+
+      div.chatwindow
+        ul#messages
     
-    ul#messages
-  
-    form()
-      input#m(type='text', placeholder='first and last' name='name')
-      button.btn(type='submit') Send
+      br
+      form()
+        input#m(type='text', placeholder='message' name='name')
+        button.btn(type='submit') Send
 
   script(src='/socket.io/socket.io.js')
   script.
