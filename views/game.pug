@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 extends layout
 
 block content
@@ -113,67 +112,4 @@ block content
         return false;
       })
 
-=======
-extends layout
-
-block content
-  h1= title
-  p Welcome to #{title}
-
-  div.container-fluid.col-sm-12
-    div.col-sm-9
-      table
-        tbody
-          each val in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-            tr
-              each val in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-                td  &nbsp; 
-
-      br
-      br
-      h4 My Score: 34
-      table
-        thead
-          tr
-            th.rack.head(colspan='7') Rack
-        tbody
-          tr
-            each val in ['A', 'B', 'V', 'Z', 'Q', '', 'E']
-              td.rack= val
-      br
-
-      div.col-sm-9
-        button.col-sm-3 Play
-        button.col-sm-3 Swap
-        button.col-sm-3 Pass
-
-    div.col-sm-3
-      div
-        h3 Remaining Tiles: 56
-
-      div.chatwindow
-        ul#messages
-    
-      br
-      form()
-        input#m(type='text', placeholder='message' name='name')
-        button.btn(type='submit') Send
-
-  script(src='/socket.io/socket.io.js')
-  script.
-    const socket = io();
-    $(function () {
-      socket.on('chat message', function(msg){
-        $('#messages').append($('<li>').text(msg));
-        window.scrollTo(0, document.body.scrollHeight);
-      });
-
-      $('form').submit(function(e){
-        e.preventDefault();
-        socket.emit('chat message', $('#m').val());
-        $('#m').val('');
-        return false;
-      });
-
->>>>>>> 91f067db9788e34761526e939dd722c1c17a7028
     });
