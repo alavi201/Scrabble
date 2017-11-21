@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -29,4 +30,37 @@ td.rack{
   border: 1px solid black;
   overflow: scroll;
   
+=======
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+
+td {
+  min-width:35px
+}
+
+th.rack.head{
+  text-align: center;
+}
+
+td.rack{
+  min-width: 75px;
+  text-align: center;
+}
+
+.chatwindow{
+  height: 325px;
+  border: 1px solid black;
+  overflow: scroll;
+  
+>>>>>>> 91f067db9788e34761526e939dd722c1c17a7028
 }
