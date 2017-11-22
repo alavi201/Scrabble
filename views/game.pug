@@ -6,12 +6,12 @@ block content
 
   div.container-fluid.col-sm-12
     div.col-sm-9
-      table
+      table(id='board')
         tbody
-          each val in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+          each row in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
             tr
-              each val in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-                td  &nbsp; 
+              each column in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+                td.board_tile(data-row=row, data-column=column)= '.'
 
       br
       br
@@ -23,17 +23,18 @@ block content
         tbody
           tr
             each val in ['A', 'B', 'V', 'Z', 'Q', '', 'E']
-              td.rack= val
+              td.rack.letter= val
       br
 
       div.col-sm-9
-        button.col-sm-3 Play
+        button.col-sm-3(id='play') Play
         button.col-sm-3 Swap
         button.col-sm-3 Pass
 
     div.col-sm-3
       div
-        h3 Remaining Tiles: 56
+        h3 Remaining Tiles: 
+          p(id='tile_count') 56
 
       div.chatwindow
         ul#messages
@@ -46,10 +47,29 @@ block content
   script(src='/socket.io/socket.io.js')
   script.
     const socket = io();
+
+    current_play = [];
+
     $(function () {
       socket.on('chat message', function(msg){
         $('#messages').append($('<li>').text(msg));
         window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      socket.on('tile', function(word){
+        
+        $(word).each(function(i, letter){
+          //console.log(letter);
+          $('td[data-column='+letter.column+'][data-row='+letter.row+']').html(letter.value);
+        });
+        
+        $('#tile_count').html('54');
+        
+        //console.log('something');
+        //alert(obj.column);
+
+        //$('td[data-column='+obj.column+'][data-row='+obj.row+']').html(obj.value);
+        //window.scrollTo(0, document.body.scrollHeight);
       });
 
       $('form').submit(function(e){
@@ -58,5 +78,38 @@ block content
         $('#m').val('');
         return false;
       });
+
+      $('.rack.letter').on('click',function(){
+        
+        $('.rack.letter').removeClass('active');
+        $(this).addClass('active');
+      });
+
+      $('.board_tile').on('click',function(){
+        
+        let active_letter = $('.rack.letter.active');
+
+
+        $(this).html($('.rack.letter.active').text());
+
+        let letter = new Object();
+        letter.row = $(this).data('row');
+        letter.column = $(this).data('column');
+        letter.value = active_letter.text();
+        active_letter.text('');
+        active_letter.addClass('empty');
+        current_play.push(letter);
+
+      });
+
+      $('#play').on('click',function(){
+        
+        socket.emit('tile',current_play);
+        console.log(current_play);
+        $('.empty').each(function(i, obj){
+          $(this).html(String.fromCharCode(Math.floor(Math.random() * 26) + 65));
+        });
+        return false;
+      })
 
     });

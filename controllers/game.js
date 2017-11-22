@@ -13,6 +13,11 @@ router.get('/', function(req, res, next) {
         io.emit( 'chat message', data );
         console.log('chat message');
       });
+
+      socket.on('tile', data => {
+        io.emit( 'tile', data );
+        console.log('tile');
+      });
       
       socket.on( 'disconnect', () =>
         console.log( 'disconnected' ));
