@@ -8,7 +8,9 @@
     "db:create:migration": "sequelize migration:generate --name ",
     "db:migrate": "sequelize db:migrate",
     "db:rollback": "sequelize db:migrate:undo",
-    "postinstall": "sequelize db:migrate"
+    "postinstall": "sequelize db:migrate",
+    "db:create:seed": "sequelize seed:generate --name ",
+    "db:seed:all": "sequelize db:seed:all"
   },
   "dependencies": {
     "body-parser": "~1.18.2",
