@@ -10,7 +10,9 @@
     "db:rollback": "sequelize db:migrate:undo",
     "postinstall": "sequelize db:migrate",
     "db:create:seed": "sequelize seed:generate --name ",
-    "db:seed:all": "sequelize db:seed:all"
+    "db:seed:all": "sequelize db:seed:all",
+    "db:seed": "sequelize db:seed --seed ",
+    "db:seed:undo": "sequelize db:seed:undo:all"
   },
   "dependencies": {
     "body-parser": "~1.18.2",
