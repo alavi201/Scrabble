@@ -43,6 +43,12 @@ module.exports = {
             createdAt: new Date(),
             updatedAt: new Date()
           }], {})
+          .then(()=>{
+            return queryInterface.bulkInsert('game_user', [
+              { id: 1, userId: 1, gameId: 1, score: 0, is_spectator: 0, is_new: true, updatedAt: new Date() },
+              { id: 2, userId: 2, gameId: 1, score: 0, is_spectator: 0, is_new: true, updatedAt: new Date() }
+            ], {})
+        })
       })
     });
   },
