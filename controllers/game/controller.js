@@ -19,16 +19,18 @@ const game_controller = () => {
         return queries.select_new_game_user( user_id, game_id )
     };
 
+    //TODO implement this function
+    //Store the message in database
     this.process_message = message_data => {
-        //Store the message in database
         return new Promise(( resolve, reject ) => {
             resolve( message_data );
         })
     };
 
+    //TODO Implement this function
+    //Validate the play
+    //If successful validation then else return false
     this.validate_game_play = ( user_id, game_id, play_data ) => {
-        //Validate the play
-        //If successful validation then else return false
         return new Promise(( resolve, reject ) => {
             resolve( true );
         })
