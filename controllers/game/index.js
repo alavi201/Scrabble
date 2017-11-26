@@ -15,6 +15,7 @@ const game = app => {
         show_page( validated, response, next );
       });
       
+      //Add the socket events only once
       controller.is_new_player( user_id, game_id ).then( new_user => {
         if( new_user ){
           add_socket_events( game_id, user_id );
@@ -53,28 +54,28 @@ const game = app => {
       });
       
       socket.on( CHAT_MESSAGE, data => {
-        //TODO Implement this function
-        // controller.process_message( data )
-        // .then( data => {
-          // socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
-        // });
-        socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
+        
+        controller.process_message( data )
+        .then( data => {
+          socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
+        });
+        // socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
         console.log('chat message: ' + data );
       });
   
       socket.on( TILE, data => {
         //TODO Implement this function
-        // controller.validate_game_play( user_id, game_id, data )
-        // .then( is_validated => {
-        //   if( is_validated ){
-        //     socket.broadcast.in( socket.room ).emit( TILE, data );
-        //   }
-        //   else{
-        //     //Inform user about incorrect data by probably using different event name?
-        //     // socket.in( socket.room ).emit( 'tile', data );
-        //   }
-        // });
-        socket.broadcast.in( socket.room ).emit( TILE, data );
+        controller.validate_game_play( user_id, game_id, data )
+        .then( is_validated => {
+          if( is_validated ){
+            socket.broadcast.in( socket.room ).emit( TILE, data );
+          }
+          else{
+            //Inform user about incorrect data by probably using different event name?
+            // socket.in( socket.room ).emit( 'tile', data );
+          }
+        });
+        // socket.broadcast.in( socket.room ).emit( TILE, data );
         console.log( 'tile' );
       });
       

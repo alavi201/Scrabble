@@ -17,25 +17,25 @@ const game_controller = () => {
 
     this.is_new_player = ( user_id, game_id )  => {
         return queries.select_new_game_user( user_id, game_id )
-        .then( (result)  => {
-            return result
-        });
     };
 
     this.process_message = message_data => {
         //Store the message in database
-        return message_data;
+        return new Promise(( resolve, reject ) => {
+            resolve( message_data );
+        })
     };
 
     this.validate_game_play = ( user_id, game_id, play_data ) => {
         //Validate the play
         //If successful validation then else return false
-        return true;
+        return new Promise(( resolve, reject ) => {
+            resolve( true );
+        })
     };
 
     this.mark_as_old_player = ( user_id, game_id ) => {
         return queries.mark_as_old_player( user_id, game_id )
-        .then( ()  => {});
     };
 
     return this;
