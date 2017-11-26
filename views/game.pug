@@ -74,6 +74,7 @@ block content
 
       $('form').submit(function(e){
         e.preventDefault();
+        $('#messages').append($('<li>').text( $('#m').val()));
         socket.emit('chat message', $('#m').val());
         $('#m').val('');
         return false;
