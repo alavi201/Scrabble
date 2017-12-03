@@ -5,14 +5,19 @@ const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT } = require('../../constants/
 
 const game = app => {
   
-  router.get('/:gameId', function(request, response, next) {
+  //TODO added /:userId for testing two player game. Remove this once implemented!
+  //Adding
+  router.get('/:gameId/:userId', function(request, response, next) {
     try{
       const game_id = request.params.gameId;
-      const user_id = 1;
+      //TODO added /:userId for testing two player game. Remove this once implemented!
+      const user_id = request.params.userId;
       //Validate the user, URI, etc.
       //If successful validation proceed with showing the page.
       controller.validate_user_with_game( user_id, game_id ).then( (validated) => {
         show_page( validated, response, next );
+      }).catch( error => {
+        console.log(error);
       });
       
       //Add the socket events only once
@@ -20,7 +25,9 @@ const game = app => {
         if( new_user ){
           add_socket_events( game_id, user_id );
         }
-      });
+      }).catch( error => {
+        console.log(error);
+      });;
       
     }
     catch( error ){
@@ -51,14 +58,18 @@ const game = app => {
       controller.mark_as_old_player( user_id, game_id ).then( () => {
         socket.room = game_id;
         socket.join( socket.room );
-      });
+      }).catch( error => {
+        console.log(error);
+      });;
       
       socket.on( CHAT_MESSAGE, data => {
         
         controller.process_message( data )
         .then( data => {
           socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
-        });
+        }).catch( error => {
+          console.log(error);
+        });;
         // socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
         console.log('chat message: ' + data );
       });
@@ -74,7 +85,9 @@ const game = app => {
             //Inform user about incorrect data by probably using different event name?
             // socket.in( socket.room ).emit( 'tile', data );
           }
-        });
+        }).catch( error => {
+          console.log(error);
+        });;
         // socket.broadcast.in( socket.room ).emit( TILE, data );
         console.log( 'tile' );
       });
