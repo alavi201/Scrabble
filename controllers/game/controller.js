@@ -123,6 +123,7 @@ const game_controller = () => {
         return (result === false) ? false : true;
     }
 
+<<<<<<< HEAD
     this.sort_accordingly = ( data, orientation ) => {
 
         sorted_letters = letters.sort( (a, b) => {
@@ -167,9 +168,78 @@ const game_controller = () => {
         }
     }
 
-    this.mark_as_old_player = ( user_id, game_id ) => {
+=======
+    function BoardTile(){
+        this.letter = 0;
+        this.premium = 0;
+    }
+
+    function Tile(xCoordinate, yCoordinate, letter){
+        this.row = xCoordinate;
+        this.column = yCoordinate;
+        this.value = letter;
+        this.is_new = false;
+    }
+
+    this.initialize_game_board = () =>{
+        let board_tile = new Object();
+        
+        let board = Array(16).fill().map(() => Array(16));
+
+        for(var i = 1 ; i < 16; i++) {
+            for(var j = 1 ; j < 16; j++) {
+                board[i][j] = new BoardTile();
+            }
+        }
+        return board;
+    }
+
+    this.get_game_board = (game_id) => {
         return new Promise(( resolve, reject ) => {
-            resolve( true );
+        
+            let board = this.initialize_game_board();
+
+            
+            queries.select_placed_tiles(game_id )
+                .then( (result)  => {
+                    if( result.length >= 1 ){
+                        result.forEach( (tile) => {
+                            boardTile = board[tile.xCoordinate][tile.yCoordinate];
+                            let game_tile = new Tile( tile.xCoordinate, tile.yCoordinate, String.fromCharCode(Math.floor(Math.random() * 26) + 65))
+                            boardTile.letter = game_tile;
+                            
+                        }, this);
+
+                        resolve(board);
+                    }
+                    
+                })
+        });
+    }
+
+    this.place_new_tiles = (board, data) =>{
+        data.forEach( (tile) => {
+            boardTile = board[tile.xCoordinate][tile.yCoordinate];
+            
+            if(boardTile.letter == 0) {
+                let new_tile = new Tile( tile.xCoordinate, tile.yCoordinate, tile.value);
+                new_tile.is_new = true;
+                boardTile.letter = new_tile;
+            }else {
+                return false;
+            }
+            
+        }, this);
+    }
+   
+>>>>>>> 342cf7fb83fcdb82f9dcd3f8cc3e10e17ab07ad0
+    this.mark_as_old_player = ( user_id, game_id ) => {
+
+        return new Promise(( resolve, reject ) => {
+            this.get_game_board(game_id).then(result =>
+                resolve( true )
+            );
+            
         });
         //return queries.mark_as_old_player( user_id, game_id )
     };
