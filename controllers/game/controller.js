@@ -123,7 +123,6 @@ const game_controller = () => {
         return (result === false) ? false : true;
     }
 
-<<<<<<< HEAD
     this.sort_accordingly = ( data, orientation ) => {
 
         sorted_letters = letters.sort( (a, b) => {
@@ -168,7 +167,6 @@ const game_controller = () => {
         }
     }
 
-=======
     function BoardTile(){
         this.letter = 0;
         this.premium = 0;
@@ -232,7 +230,6 @@ const game_controller = () => {
         }, this);
     }
    
->>>>>>> 342cf7fb83fcdb82f9dcd3f8cc3e10e17ab07ad0
     this.mark_as_old_player = ( user_id, game_id ) => {
 
         return new Promise(( resolve, reject ) => {
