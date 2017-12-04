@@ -35,7 +35,14 @@ const game_controller = () => {
         return new Promise(( resolve, reject ) => {
             
             let result = false;
-            flow = this.check_flow( play_data);
+            let orientation = this.get_orientation( play_data );
+            if (orientation === NO_FLOW ){
+                resolve( false ); 
+            }
+
+            let sorted_new_letters = this.sort_accordingly( play_data, orientation );
+
+
 
             if( flow === FLOW_TOP_TO_BOTTOM || flow === FLOW_LEFT_TO_RIGHT ){
                 result = true;
@@ -91,32 +98,16 @@ const game_controller = () => {
         })
     };
 
-    this.check_flow = ( letters ) => {
-        
+    this.get_orientation = ( letters ) => {       
         // Check if flow is left to right
         var rows = letters.map( letter_obj => letter_obj.row )
         if( this.check_all_same( rows )){
-            sorted_letters = letters.sort( (a, b) => {
-                return a.column - b.column;
-              });
-            
-            cols = sorted_letters.map( letter_obj => letter_obj.column );
-            if(this.check_sequence( cols )){
-                return FLOW_LEFT_TO_RIGHT;
-            }
+            return FLOW_LEFT_TO_RIGHT;
         }
-
         // Check if flow is top to bottom
         var cols = letters.map( letter_obj => letter_obj.column )
         if( this.check_all_same( cols )){
-            sorted_letters = letters.sort( (a, b) => {
-                return a.row - b.row;
-              });
-            
-            row = sorted_letters.map( letter_obj => letter_obj.row );
-            if(this.check_sequence( row )){
-                return FLOW_TOP_TO_BOTTOM;
-            }
+            return FLOW_TOP_TO_BOTTOM;
         }
 
         return NO_FLOW;
@@ -130,6 +121,50 @@ const game_controller = () => {
     this.check_all_same = ( sequence ) => {
         let result = sequence.reduce( (a, b) => { return (a === b) ? b : false });
         return (result === false) ? false : true;
+    }
+
+    this.sort_accordingly = ( data, orientation ) => {
+
+        sorted_letters = letters.sort( (a, b) => {
+            if (orientation === FLOW_LEFT_TO_RIGHT){
+                return a.column - b.column;
+            }
+            else{
+                return a.row - b.row;
+            }
+          });
+
+        return sorted_letters;
+    }
+
+    this.find_starting_letter_accordingly = ( coordinates, orientation, board ) => {
+        let starting_coordinates = coordinates;
+        let row = coordinates[0];
+        let col = coordinates[1];
+
+        if( orientation === FLOW_LEFT_TO_RIGHT ){
+            for( let index = col; index >= 1; index --  ){
+                let board_tile = board[ row ][ index ];
+                if ( board_tile.letter !== 0){
+                    starting_coordinates = [ row, index ];
+                }
+                else {
+                    return starting_coordinates;
+                }
+            }
+        }
+
+        if( orientation === FLOW_TOP_TO_BOTTOM ){
+            for( let index = row; index >= 1; index --  ){
+                let board_tile = board[ index ][ col ];
+                if ( board_tile.letter !== 0){
+                    starting_coordinates = [ index, col ];
+                }
+                else {
+                    return starting_coordinates;
+                }
+            }
+        }
     }
 
     this.mark_as_old_player = ( user_id, game_id ) => {
