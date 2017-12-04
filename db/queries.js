@@ -27,6 +27,13 @@ const queries = database => {
         })
     };
 
+    this.select_placed_tiles = (game_id) =>{
+        return database.any('SELECT * FROM game_tiles WHERE "gameId" = $1',[game_id])
+         .then( data  => {
+             return data;
+         })
+     };
+
     return this;
 };
 module.exports = queries;
