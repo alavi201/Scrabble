@@ -33,14 +33,61 @@ const game_controller = () => {
     this.validate_game_play = ( user_id, game_id, play_data ) => {
 
         return new Promise(( resolve, reject ) => {
+            
             let result = false;
             flow = this.check_flow( play_data);
 
             if( flow === FLOW_TOP_TO_BOTTOM || flow === FLOW_LEFT_TO_RIGHT ){
                 result = true;
             }
+            
+            if (result){
+                this.validate_word_api('dummy').then( validation => {
+                    result = validation;
+                    resolve( validation );
+                })
+            }
+        })
+    };
 
-            resolve( result );
+    this.validate_word_api = ( word ) => {
+        return new Promise(( resolve, reject ) => {
+            //API CALL
+            const https = require("https");
+            const url = "https://www.wordgamedictionary.com/api/v1/references/scrabble/" + word + "?key=7.425271736209773e29";
+
+            let xml_response = "";
+            let parsedXml = "";
+            let result = 0;
+
+            https.get(url, res => {
+                res.setEncoding("utf8");
+                res.on("data", data => {
+                    xml_response += data;
+                });
+
+            res.on("end", () => {
+
+                    console.log(xml_response);
+                    
+                    var parseString = require('xml2js').parseString;
+
+                    parseString(xml_response,{ explicitArray : false }, function (err, result) {
+                        console.dir(JSON.stringify(result));
+                        parsedXml = JSON.stringify(result);
+                    });
+
+                    console.log(parsedXml);
+
+                    parsedXml = JSON.parse(parsedXml);
+
+                    //let isValidWord = parsedXml['scrabble'];
+                    //console.log(JSON.parse(parsedXml));
+                    console.log(parsedXml.entry.scrabble);
+                    result = parsedXml.entry.scrabble;
+                    resolve( result );
+                });
+            });
         })
     };
 
@@ -86,7 +133,10 @@ const game_controller = () => {
     }
 
     this.mark_as_old_player = ( user_id, game_id ) => {
-        return queries.mark_as_old_player( user_id, game_id )
+        return new Promise(( resolve, reject ) => {
+            resolve( true );
+        });
+        //return queries.mark_as_old_player( user_id, game_id )
     };
 
     return this;
