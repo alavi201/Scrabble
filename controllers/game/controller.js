@@ -180,6 +180,20 @@ const game_controller = () => {
         });
     }
 
+    this.place_new_tiles = (board, data) =>{
+        data.forEach( (tile) => {
+            boardTile = board[tile.xCoordinate][tile.yCoordinate];
+            
+            if(boardTile.letter == 0) {
+                let new_tile = new Tile( tile.xCoordinate, tile.yCoordinate, tile.value);
+                new_tile.is_new = true;
+                boardTile.letter = new_tile;
+            }else {
+                return false;
+            }
+            
+        }, this);
+    }
    
     this.mark_as_old_player = ( user_id, game_id ) => {
 
