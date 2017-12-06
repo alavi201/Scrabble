@@ -1,27 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller')();
-const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT } = require('../../constants/events');
+const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA } = require('../../constants/events');
 
 const game = app => {
   
-  //TODO added /:userId for testing two player game. Remove this once implemented!
-  //Adding
   router.get('/:gameId/:userId', function(request, response, next) {
     try{
       const game_id = request.params.gameId;
-      //TODO added /:userId for testing two player game. Remove this once implemented!
       const user_id = request.params.userId;
-      //Validate the user, URI, etc.
-      //If successful validation proceed with showing the page.
-      controller.validate_user_with_game( user_id, game_id ).then( (validated) => {
+
+
+      controller.validate_user_with_game( user_id, game_id )
+      .then( (validated) => {
         show_page( validated, response, next );
       }).catch( error => {
         console.log(error);
       });
       
       //Add the socket events only once
-      controller.is_new_player( user_id, game_id ).then( new_user => {
+      controller.is_new_player( user_id, game_id )
+      .then( new_user => {
         if( new_user ){
           add_socket_events( game_id, user_id );
         }
@@ -62,42 +61,42 @@ const game = app => {
         console.log(error);
       });;
       
-      socket.on( CHAT_MESSAGE, data => {
-        
-        controller.process_message( data )
-        .then( data => {
-          socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
-        }).catch( error => {
-          console.log(error);
-        });;
-        // socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
-        console.log('chat message: ' + data );
-      });
+      socket.on( CHAT_MESSAGE, process_chat_message );
   
-      socket.on( TILE, data => {
-        //TODO Implement this function
-        controller.validate_game_play( user_id, game_id, data )
-        .then( is_validated => {
-          if( is_validated ){
-            socket.broadcast.in( socket.room ).emit( TILE, data );
-          }
-          else{
-            //Inform user about incorrect data by probably using different event name?
-            // socket.in( socket.room ).emit( 'tile', data );
-          }
-        }).catch( error => {
-          console.log(error);
-        });;
-        // socket.broadcast.in( socket.room ).emit( TILE, data );
-        console.log( 'tile' );
-      });
+      socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
       
       socket.on( DISCONNECT, () => {
-        // Don't use this for game quit logic
         console.log( 'socket disconnected' );
       }); 
     });
   };
+
+  const validate_play = (data, game_id, user_id, socket) => {
+    if( data.lenght !== 0 ){
+      return controller.validate_game_play( user_id, game_id, data )
+      .then( is_validated => {
+        if( is_validated ){
+          socket.broadcast.in( socket.room ).emit( TILE, data );
+        }
+        else{
+          socket.in( socket.room ).emit( INVALID_MOVE, data );
+        }
+      })
+    }
+    else{
+      socket.in( socket.room ).emit( NO_DATA, data );
+    }
+
+  };
+
+  const process_chat_message = data => {
+    return controller.process_message( data )
+    .then( data => {
+      socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
+    })
+    // socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
+    console.log('chat message: ' + data );
+  }
 
   return router;
 }
