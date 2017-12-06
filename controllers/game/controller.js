@@ -37,11 +37,15 @@ const game_controller = () => {
         .then( this.place_new_tiles )
         .then( this.find_starting_letter_accordingly )
         .then( this.extract_word )
+        //uncomment the below .then once get_touching_tiles is implemented
+        //.then( validate_move )
+        //and comment the below two .then
         .then( this.get_word_from_tiles )
-        .then( this.validate_word_api )
+        .then( validate_word_api )
+
     };
 
-    this.validate_word_api = ( word ) => {
+    function validate_word_api( word ) {
         return new Promise(( resolve, reject ) => {
             //API CALL
             const https = require("https");
@@ -59,25 +63,21 @@ const game_controller = () => {
 
             res.on("end", () => {
 
-                    console.log(xml_response);
-                    
-                    var parseString = require('xml2js').parseString;
+                console.log(xml_response);
+                
+                var parseString = require('xml2js').parseString;
 
-                    parseString(xml_response,{ explicitArray : false }, function (err, result) {
-                        console.dir(JSON.stringify(result));
-                        parsedXml = JSON.stringify(result);
-                    });
-
-                    console.log(parsedXml);
-
-                    parsedXml = JSON.parse(parsedXml);
-
-                    //let isValidWord = parsedXml['scrabble'];
-                    //console.log(JSON.parse(parsedXml));
-                    console.log(parsedXml.entry.scrabble);
-                    result = parsedXml.entry.scrabble;
-                    resolve( parseInt(result) );
+                parseString(xml_response,{ explicitArray : false }, function (err, result) {
+                    console.dir(JSON.stringify(result));
+                    parsedXml = JSON.stringify(result);
                 });
+
+                console.log(parsedXml);
+
+                parsedXml = JSON.parse(parsedXml);
+                result = parsedXml.entry.scrabble;
+                resolve( parseInt(result) );
+            });
             });
         })
     };
@@ -122,10 +122,8 @@ const game_controller = () => {
         return sorted_letters;
     }
 
-    this.find_starting_letter_accordingly = ( [letters, orientation, board ] ) => {
-        let sorted_letters = this.sort_accordingly( letters, orientation );
-        let starting_coordinates = [ sorted_letters[0].row, sorted_letters[0].column];
-        let starting_letter = sorted_letters[0];
+    this.find_starting_letter_accordingly = ( [orientation, board, starting_letter ] ) => {
+        let starting_coordinates = [ starting_letter.row, starting_letter.column];
         let row = starting_letter.row;
         let col = starting_letter.column;
 
@@ -137,7 +135,7 @@ const game_controller = () => {
                 }
                 else {
                     let start_tile = board[starting_coordinates[0] ][starting_coordinates[1]];
-                    return [letters, orientation, board, start_tile.letter] ;
+                    return [orientation, board, start_tile.letter] ;
                 }
             }
         }
@@ -150,7 +148,7 @@ const game_controller = () => {
                 }
                 else {
                     let start_tile = board[starting_coordinates[0] ][starting_coordinates[1]];
-                    return [letters, orientation, board, start_tile.letter] ;
+                    return [orientation, board, start_tile.letter] ;
                 }
             }
         }
@@ -207,7 +205,8 @@ const game_controller = () => {
                 boardTile.letter = new_tile;
             }   
         }, this);
-        return [letters, orientation, board ];
+        let sorted_letters = this.sort_accordingly( letters, orientation );
+        return [orientation, board, sorted_letters[0]];
     }
    
     this.mark_as_old_player = ( user_id, game_id ) => {
@@ -221,7 +220,7 @@ const game_controller = () => {
         //return queries.mark_as_old_player( user_id, game_id )
     };
 
-    this.extract_word = ( [letters, orientation, board, start_tile] ) => {
+    this.extract_word = ( [orientation, board, start_tile] ) => {
         let row = start_tile.row;
         let column = start_tile.column;
         let word = [];
@@ -280,6 +279,47 @@ const game_controller = () => {
        
        return word_string;
     };
+
+    //TODO
+    this.get_touching_tiles = ([ orientation, board, word ]) => {
+        //for every letter in word
+        // check if other tile is touching at top/left (based on orientation)
+        //      if touching, add that letter to an array.
+        // if not touching, then check bottom/right (based on orientation) for touching tile
+        //      if touching then add that letter to an array.
+        //return the array - touching_tiles.
+        return touching_tiles;
+    }
+
+    this.get_touching_words = ( touching_tiles ) =>{
+        touching_words = [];
+        let opposite_orientation = (orientation === FLOW_LEFT_TO_RIGHT) ? FLOW_TOP_TO_BOTTOM : FLOW_LEFT_TO_RIGHT;
+        for( let index = 0; index < touching_tiles.length; index++ ){
+            let start_tile = this.find_starting_letter_accordingly([opposite_orientation, board, touching_tiles[index] ]);
+            let word_result = this.extract_word( [opposite_orientation, board, start_tile[2]] );
+            touching_words.push( word_result[2]);
+        }
+        return touching_words;
+    }
+
+   async function validate_all_words( all_words ){
+        for( let index = 0; index < all_words.length; index++ ){
+            let is_valid = await validate_word_api( all_words[index] );
+            if ( is_valid !== 1){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    this.validate_move = ( [orientation, board, word] ) => {
+        touching_tiles = this.get_touching_tiles([ orientation, board, word ]);
+        touching_words = this.get_touching_words( touching_tiles );
+        all_words = touching_words.push( word );
+
+        return validate_all_words( all_words );
+
+    }
 
     return this;
 }
