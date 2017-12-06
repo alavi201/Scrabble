@@ -31,30 +31,14 @@ const game_controller = () => {
     //TODO Implement this function
     // Add the already existing letters if they exist.
     this.validate_game_play = ( user_id, game_id, play_data ) => {
-
-        return new Promise(( resolve, reject ) => {
-            
-            let result = false;
-            let orientation = this.get_orientation( play_data );
-            if (orientation === NO_FLOW ){
-                resolve( false ); 
-            }
-
-            let sorted_new_letters = this.sort_accordingly( play_data, orientation );
-
-
-
-            if( flow === FLOW_TOP_TO_BOTTOM || flow === FLOW_LEFT_TO_RIGHT ){
-                result = true;
-            }
-            
-            if (result){
-                this.validate_word_api('dummy').then( validation => {
-                    result = validation;
-                    resolve( validation );
-                })
-            }
-        })
+        return this.create_tiles( play_data )
+        .then( this.get_orientation )
+        .then( result => this.get_game_board( result, game_id)  )
+        .then( this.place_new_tiles )
+        .then( this.find_starting_letter_accordingly )
+        .then( this.extract_word )
+        .then( this.get_word_from_tiles )
+        .then( this.validate_word_api )
     };
 
     this.validate_word_api = ( word ) => {
@@ -92,7 +76,7 @@ const game_controller = () => {
                     //console.log(JSON.parse(parsedXml));
                     console.log(parsedXml.entry.scrabble);
                     result = parsedXml.entry.scrabble;
-                    resolve( result );
+                    resolve( parseInt(result) );
                 });
             });
         })
@@ -100,17 +84,18 @@ const game_controller = () => {
 
     this.get_orientation = ( letters ) => {       
         // Check if flow is left to right
+        let orientation = NO_FLOW;
         var rows = letters.map( letter_obj => letter_obj.row )
         if( this.check_all_same( rows )){
-            return FLOW_LEFT_TO_RIGHT;
+            orientation = FLOW_LEFT_TO_RIGHT;
         }
         // Check if flow is top to bottom
         var cols = letters.map( letter_obj => letter_obj.column )
         if( this.check_all_same( cols )){
-            return FLOW_TOP_TO_BOTTOM;
+            orientation = FLOW_TOP_TO_BOTTOM;
         }
 
-        return NO_FLOW;
+        return [letters, orientation];
     };
 
     this.check_sequence = ( sequence ) => {
@@ -125,7 +110,7 @@ const game_controller = () => {
 
     this.sort_accordingly = ( data, orientation ) => {
 
-        sorted_letters = letters.sort( (a, b) => {
+        sorted_letters = data.sort( (a, b) => {
             if (orientation === FLOW_LEFT_TO_RIGHT){
                 return a.column - b.column;
             }
@@ -137,10 +122,12 @@ const game_controller = () => {
         return sorted_letters;
     }
 
-    this.find_starting_letter_accordingly = ( coordinates, orientation, board ) => {
-        let starting_coordinates = coordinates;
-        let row = coordinates[0];
-        let col = coordinates[1];
+    this.find_starting_letter_accordingly = ( [letters, orientation, board ] ) => {
+        let sorted_letters = this.sort_accordingly( letters, orientation );
+        let starting_coordinates = [ sorted_letters[0].row, sorted_letters[0].column];
+        let starting_letter = sorted_letters[0];
+        let row = starting_letter.row;
+        let col = starting_letter.column;
 
         if( orientation === FLOW_LEFT_TO_RIGHT ){
             for( let index = col; index >= 1; index --  ){
@@ -149,7 +136,8 @@ const game_controller = () => {
                     starting_coordinates = [ row, index ];
                 }
                 else {
-                    return starting_coordinates;
+                    let start_tile = board[starting_coordinates[0] ][starting_coordinates[1]];
+                    return [letters, orientation, board, start_tile.letter] ;
                 }
             }
         }
@@ -161,7 +149,8 @@ const game_controller = () => {
                     starting_coordinates = [ index, col ];
                 }
                 else {
-                    return starting_coordinates;
+                    let start_tile = board[starting_coordinates[0] ][starting_coordinates[1]];
+                    return [letters, orientation, board, start_tile.letter] ;
                 }
             }
         }
@@ -192,42 +181,33 @@ const game_controller = () => {
         return board;
     }
 
-    this.get_game_board = (game_id) => {
-        return new Promise(( resolve, reject ) => {
-        
+    this.get_game_board = ( [letters, orientation], game_id) => {
+        return queries.select_placed_tiles( game_id )
+        .then( (result)  => {
             let board = this.initialize_game_board();
-
-            
-            queries.select_placed_tiles(game_id )
-                .then( (result)  => {
-                    if( result.length >= 1 ){
-                        result.forEach( (tile) => {
-                            boardTile = board[tile.xCoordinate][tile.yCoordinate];
-                            let game_tile = new Tile( tile.xCoordinate, tile.yCoordinate, String.fromCharCode(Math.floor(Math.random() * 26) + 65))
-                            boardTile.letter = game_tile;
-                            
-                        }, this);
-
-                        resolve(board);
-                    }
-                    
-                })
-        });
+            if( result.length >= 1 ){
+                result.forEach( (tile) => {
+                    boardTile = board[tile.xCoordinate][tile.yCoordinate];
+                    let game_tile = new Tile( tile.xCoordinate, tile.yCoordinate, String.fromCharCode(Math.floor(Math.random() * 26) + 65))
+                    boardTile.letter = game_tile;
+                }, this);
+                return ( [letters, orientation, board ] );
+            }
+        })
     }
 
-    this.place_new_tiles = (board, data) =>{
-        data.forEach( (tile) => {
-            boardTile = board[tile.xCoordinate][tile.yCoordinate];
+    this.place_new_tiles = ([letters, orientation, board ]) =>{
+
+        letters.forEach( (tile) => {
+            let boardTile = board[tile.row][tile.column];
             
             if(boardTile.letter == 0) {
-                let new_tile = new Tile( tile.xCoordinate, tile.yCoordinate, tile.value);
+                let new_tile = tile;
                 new_tile.is_new = true;
                 boardTile.letter = new_tile;
-            }else {
-                return false;
-            }
-            
+            }   
         }, this);
+        return [letters, orientation, board ];
     }
    
     this.mark_as_old_player = ( user_id, game_id ) => {
@@ -239,6 +219,66 @@ const game_controller = () => {
             
         });
         //return queries.mark_as_old_player( user_id, game_id )
+    };
+
+    this.extract_word = ( [letters, orientation, board, start_tile] ) => {
+        let row = start_tile.row;
+        let column = start_tile.column;
+        let word = [];
+        let new_word_count = 0;
+
+       //row is fixed, increment column till we hit a blank tile on the board or the end
+        if( orientation === FLOW_LEFT_TO_RIGHT ){
+            while(board[row][column].letter != 0 && column < 16) {
+                board_tile = board[row][column];
+                tile = board_tile.letter;
+                word.push( tile );
+
+               if(tile.is_new == 1)
+                    new_word_count++;
+
+               column++;
+            }
+        }
+
+       //row is fixed, increment row till we hit a blank tile on the board or the end
+        if( orientation === FLOW_TOP_TO_BOTTOM ){
+            while(board[row][column].letter != 0 && column < 16) {
+                board_tile = board[row][column];
+                tile = board_tile.letter;
+                word.push( tile );
+
+               if(tile.is_new == 1)
+                    new_word_count++;
+
+               row++;
+            }
+        }
+
+        return [ orientation, board, word ];
+    }
+
+    this.create_tiles = ( play_data ) => {
+        return new Promise( ( resolve, reject ) => {
+            let converted_tiles = [];        
+            play_data.forEach( (tile) => {
+                    
+                let new_tile = new Tile( tile.row, tile.column, tile.value);
+                    new_tile.is_new = true;
+                    converted_tiles.push(new_tile);
+                }, this);
+            resolve( converted_tiles );
+        })
+    }
+
+    this.get_word_from_tiles = ( [ orientation, board, word ] ) => {
+       let word_string = "";
+        
+       word.forEach( (tile) => {
+            word_string += tile.value;
+        }, this);  
+       
+       return word_string;
     };
 
     return this;
