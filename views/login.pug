@@ -8,26 +8,32 @@ block content
                 h2 logo
             .navbar-collapse
                 ul.navbar-right
-                    form.ui.large.form(method='POST')
+                    form(method='POST',action='')
                             .ui.stacked.segment
                                 .field
                                     .ui.input
-                                        input(type="text", name="email", placeholder="E-mail address")
+                                        input(type="text", name="username", placeholder="Username")
                                         input(type="password",  name="password", placeholder="Password")
-                                .ui.fluid.large.teal.submit.button Login
+                                        input(type="hidden", name="loginType", value="login")
+                                button.btn.btn-primary(type='submit') Login
                             
     .container-fluid.scrollable
         .right-section
-            h1 Sign Up!
-            .column
-                input(type="text", name="username", placeholder="Username")
-            .column
-               input(type="text", name="email", placeholder="E-mail address") 
-            .column
-               input(type="password", name="password", placeholder="Password") 
-            .column
-               input(type="password", name="confirmPassword", placeholder="Password") 
-            .column
-                a(href='#') Sign Up
+            form(method='POST' action='')
+                h1 Sign Up!
+                .column
+                    input(type="text", name="name", placeholder="Name")
+                .column
+                    input(type="text", name="username", placeholder="Username")
+                .column
+                    input(type="text", name="email", placeholder="E-mail address") 
+                .column
+                    input(type="password", name="password", placeholder="Password") 
+                .column
+                    input(type="password", name="confirmPassword", placeholder="Password") 
+                .column
+                    input(type="hidden", name="loginType", value="signup") 
+                .column
+                    button.btn.btn-primary(type='submit') Sign Up
         .left-section
             img(src="/images/scrabble.jpg", alt="scrabble board")
