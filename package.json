@@ -8,7 +8,11 @@
     "db:create:migration": "sequelize migration:generate --name ",
     "db:migrate": "sequelize db:migrate",
     "db:rollback": "sequelize db:migrate:undo",
-    "postinstall": "sequelize db:migrate"
+    "postinstall": "sequelize db:migrate",
+    "db:create:seed": "sequelize seed:generate --name ",
+    "db:seed:all": "sequelize db:seed:all",
+    "db:seed": "sequelize db:seed --seed ",
+    "db:seed:undo": "sequelize db:seed:undo:all"
   },
   "dependencies": {
     "body-parser": "~1.18.2",
@@ -24,7 +28,8 @@
     "sequelize": "^4.19.0",
     "sequelize-cli": "^3.0.0",
     "serve-favicon": "~2.4.5",
-    "socket.io": "^2.0.4"
+    "socket.io": "^2.0.4",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "nodemon": "^1.12.1"

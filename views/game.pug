@@ -22,7 +22,7 @@ block content
             th.rack.head(colspan='7') Rack
         tbody
           tr
-            each val in ['A', 'B', 'V', 'Z', 'Q', '', 'E']
+            each val in ['D', 'B', 'V', 'Z', 'Q', '', 'E']
               td.rack.letter= val
       br
 
@@ -74,6 +74,7 @@ block content
 
       $('form').submit(function(e){
         e.preventDefault();
+        $('#messages').append($('<li>').text( $('#m').val()));
         socket.emit('chat message', $('#m').val());
         $('#m').val('');
         return false;
@@ -109,6 +110,7 @@ block content
         $('.empty').each(function(i, obj){
           $(this).html(String.fromCharCode(Math.floor(Math.random() * 26) + 65));
         });
+        current_play = [];
         return false;
       })
 
