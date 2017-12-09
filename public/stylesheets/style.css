@@ -12,11 +12,15 @@ body {
 }
 
 .container-fluid.scrollable {
-  padding-top: 70px;
+  padding-top: 30px;
   height: 100%; 
   overflow: auto; 
-  background: #ccc;
+  background: rgb(255, 255, 255);
 }
+
+/*.ui.input{
+  padding-left: 30px;
+}*/
 
 .right-section{
   float: right;
@@ -32,11 +36,13 @@ body {
 }
 
 a {
-  color: #00B7FF;
+  padding-left: 30px;
+  color: rgb(0, 255, 21);
 }
 
 table, th, td {
   border: 1px solid black;
+  padding-bottom: 30px;
 }
 
 td {
@@ -53,8 +59,14 @@ td.rack{
 }
 
 .chatwindow{
+  padding-top: 30px;
   height: 325px;
   border: 1px solid black;
   overflow: scroll;
   
+}
+
+.column{
+  padding-bottom: 30px;
+  padding-left: 30px;
 }
