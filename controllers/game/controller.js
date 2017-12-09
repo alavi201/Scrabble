@@ -154,9 +154,11 @@ const game_controller = () => {
         }
     }
 
-    function BoardTile(){
+    function BoardTile( row, column ){
         this.letter = 0;
         this.premium = 0;
+        this.row = row;
+        this.column = column;
     }
 
     function Tile(xCoordinate, yCoordinate, letter){
@@ -173,7 +175,7 @@ const game_controller = () => {
 
         for(var i = 1 ; i < 16; i++) {
             for(var j = 1 ; j < 16; j++) {
-                board[i][j] = new BoardTile();
+                board[i][j] = new BoardTile(i, j);
             }
         }
         return board;
