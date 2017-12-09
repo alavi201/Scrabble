@@ -13,7 +13,7 @@ const game = app => {
 
       controller.validate_user_with_game( user_id, game_id )
       .then( (validated) => {
-        show_page( validated, response, next );
+        show_page( validated, response, next, game_id );
       }).catch( error => {
         console.log(error);
       });
@@ -36,9 +36,10 @@ const game = app => {
     
   });
 
-  const show_page = ( boolean_value, response, next) => {
+  const show_page = ( boolean_value, response, next, game_id ) => {
     if( boolean_value ){
-      response.render('game', { title: 'Game' });
+      controller.get_game_board([0, 0], game_id)
+      .then( result => response.render('game', { title: 'Game', game_board: result[2] }));
     }
     else{
       var err = new Error('Forbidden');
