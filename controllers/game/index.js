@@ -62,7 +62,7 @@ const game = app => {
         console.log(error);
       });;
       
-      socket.on( CHAT_MESSAGE, process_chat_message );
+      socket.on( CHAT_MESSAGE, data => process_chat_message(data, user_id, socket) );
   
       socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
       
@@ -90,8 +90,8 @@ const game = app => {
 
   };
 
-  const process_chat_message = data => {
-    return controller.process_message( data )
+  const process_chat_message = (data, user_id, socket ) => {
+    return controller.process_message( data, user_id )
     .then( data => {
       socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
     })
