@@ -38,10 +38,10 @@ const game_controller = () => {
         .then( this.find_starting_letter_accordingly )
         .then( this.extract_word )
         //uncomment the below .then once get_touching_tiles is implemented
-        //.then( validate_move )
+        .then( this.validate_move )
         //and comment the below two .then
-        .then( this.get_word_from_tiles )
-        .then( validate_word_api )
+        //.then( this.get_word_from_tiles )
+        //.then( validate_word_api )
 
     };
 
@@ -242,7 +242,7 @@ const game_controller = () => {
 
        //row is fixed, increment row till we hit a blank tile on the board or the end
         if( orientation === FLOW_TOP_TO_BOTTOM ){
-            while(board[row][column].letter != 0 && column < 16) {
+            while(board[row][column].letter != 0 && row < 16) {
                 board_tile = board[row][column];
                 tile = board_tile.letter;
                 word.push( tile );
@@ -270,7 +270,7 @@ const game_controller = () => {
         })
     }
 
-    this.get_word_from_tiles = ( [ orientation, board, word ] ) => {
+    function get_word_from_tiles( [ orientation, board, word ] ) {
        let word_string = "";
         
        word.forEach( (tile) => {
@@ -280,18 +280,30 @@ const game_controller = () => {
        return word_string;
     };
 
-    //TODO
     this.get_touching_tiles = ([ orientation, board, word ]) => {
-        //for every letter in word
-        // check if other tile is touching at top/left (based on orientation)
-        //      if touching, add that letter to an array.
-        // if not touching, then check bottom/right (based on orientation) for touching tile
-        //      if touching then add that letter to an array.
-        //return the array - touching_tiles.
+
+        let touching_tiles = [];
+
+        word.forEach( (tile) => {
+            if(tile.is_new == true ) {
+                if(orientation == FLOW_LEFT_TO_RIGHT){
+                    if((tile.row > 1 && board[tile.row -1][tile.column].letter !=0) || (tile.row < 15 && board[tile.row + 1][tile.column].letter !=0)){
+                        touching_tiles.push(tile);
+                    }
+                }
+
+                if(orientation == FLOW_TOP_TO_BOTTOM){
+                    if((tile.column > 1 && board[tile.row][tile.column - 1].letter !=0) || (tile.column < 15 && board[tile.row][tile.column + 1].letter !=0)){
+                        touching_tiles.push(tile);
+                    }
+                }
+            }  
+        }, this);
+        
         return touching_tiles;
     }
 
-    this.get_touching_words = ( touching_tiles ) =>{
+    this.get_touching_words = ( [orientation, board, touching_tiles] ) =>{
         touching_words = [];
         let opposite_orientation = (orientation === FLOW_LEFT_TO_RIGHT) ? FLOW_TOP_TO_BOTTOM : FLOW_LEFT_TO_RIGHT;
         for( let index = 0; index < touching_tiles.length; index++ ){
@@ -304,7 +316,8 @@ const game_controller = () => {
 
    async function validate_all_words( all_words ){
         for( let index = 0; index < all_words.length; index++ ){
-            let is_valid = await validate_word_api( all_words[index] );
+            let string_word = get_word_from_tiles([ 0, 0, all_words[index] ]);
+            let is_valid = await validate_word_api( string_word );
             if ( is_valid !== 1){
                 return false;
             }
@@ -313,11 +326,12 @@ const game_controller = () => {
     }
 
     this.validate_move = ( [orientation, board, word] ) => {
-        touching_tiles = this.get_touching_tiles([ orientation, board, word ]);
-        touching_words = this.get_touching_words( touching_tiles );
-        all_words = touching_words.push( word );
+        let touching_tiles = this.get_touching_tiles([ orientation, board, word ]);
 
-        return validate_all_words( all_words );
+        let touching_words = this.get_touching_words( [orientation, board, touching_tiles] );
+        touching_words.push( word );
+
+        return validate_all_words( touching_words );
 
     }
 
