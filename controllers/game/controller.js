@@ -1,6 +1,7 @@
 const db = require('../../db');
 const queries = require('../../db/queries')(db);
 const { FLOW_TOP_TO_BOTTOM, FLOW_LEFT_TO_RIGHT, NO_FLOW } = require('../../constants/play_validation');
+const {LETTER_VALUES} = require('../../constants/letters');
 
 const game_controller = () => {
 
@@ -162,11 +163,13 @@ const game_controller = () => {
         this.column = column;
     }
 
-    function Tile(xCoordinate, yCoordinate, letter){
+    function Tile(xCoordinate, yCoordinate, letter, score, game_tile_id){
         this.row = xCoordinate;
         this.column = yCoordinate;
         this.value = letter;
         this.is_new = false;
+        this.game_tile_id = game_tile_id;
+        this.score = score
     }
 
     this.initialize_game_board = () =>{
@@ -188,9 +191,11 @@ const game_controller = () => {
             let board = this.initialize_game_board();
             if( result.length >= 1 ){
                 result.forEach( (tile) => {
-                    boardTile = board[tile.xCoordinate][tile.yCoordinate];
-                    let game_tile = new Tile( tile.xCoordinate, tile.yCoordinate, String.fromCharCode(Math.floor(Math.random() * 26) + 65))
-                    boardTile.letter = game_tile;
+                    if(tile.xCoordinate != 0 && tile.yCoordinate !=0) {
+                        let boardTile = board[tile.xCoordinate][tile.yCoordinate];
+                        let game_tile = new Tile( tile.xCoordinate, tile.yCoordinate, LETTER_VALUES[tile.tileId].value,  LETTER_VALUES[tile.tileId].score, tile.id)
+                        boardTile.letter = game_tile;
+                    }
                 }, this);
                 return ( [letters, orientation, board ] );
             }
@@ -333,6 +338,26 @@ const game_controller = () => {
 
         return validate_all_words( touching_words );
 
+    }
+
+    this.get_player_rack = ([user_id, game_id] ) => {
+        return queries.select_player_rack(user_id, game_id)
+        .then( (result)  => {
+            if( result.length >= 1 ){
+                
+                let rack = []; 
+                
+                result.forEach( (letter) => {
+                    let rack_tile = new Tile( letter.xCoordinate, letter.yCoordinate, LETTER_VALUES[letter.tileId].value, LETTER_VALUES[letter.tileId].score, letter.id)
+                    rack.push(rack_tile);                   
+                }, this);  
+
+                return rack;
+            }
+            else{
+                return false;
+            }
+        })
     }
 
     return this;
