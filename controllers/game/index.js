@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller')();
-const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA } = require('../../constants/events');
+const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, RACK } = require('../../constants/events');
 
 const game = app => {
   
@@ -65,6 +65,8 @@ const game = app => {
       socket.on( CHAT_MESSAGE, process_chat_message );
   
       socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
+
+      socket.on( RACK, data=> get_player_rack(userId, game_id));
       
       socket.on( DISCONNECT, () => {
         console.log( 'socket disconnected' );
