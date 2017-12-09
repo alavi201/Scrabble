@@ -242,7 +242,7 @@ const game_controller = () => {
 
        //row is fixed, increment row till we hit a blank tile on the board or the end
         if( orientation === FLOW_TOP_TO_BOTTOM ){
-            while(board[row][column].letter != 0 && column < 16) {
+            while(board[row][column].letter != 0 && row < 16) {
                 board_tile = board[row][column];
                 tile = board_tile.letter;
                 word.push( tile );
@@ -270,7 +270,7 @@ const game_controller = () => {
         })
     }
 
-    this.get_word_from_tiles = ( [ orientation, board, word ] ) => {
+    function get_word_from_tiles( [ orientation, board, word ] ) {
        let word_string = "";
         
        word.forEach( (tile) => {
@@ -316,7 +316,8 @@ const game_controller = () => {
 
    async function validate_all_words( all_words ){
         for( let index = 0; index < all_words.length; index++ ){
-            let is_valid = await validate_word_api( all_words[index] );
+            let string_word = get_word_from_tiles([ 0, 0, all_words[index] ]);
+            let is_valid = await validate_word_api( string_word );
             if ( is_valid !== 1){
                 return false;
             }
@@ -325,11 +326,12 @@ const game_controller = () => {
     }
 
     this.validate_move = ( [orientation, board, word] ) => {
-        touching_tiles = this.get_touching_tiles([ orientation, board, word ]);
-        touching_words = this.get_touching_words( [orientation, board, touching_tiles] );
-        all_words = touching_words.push( word );
+        let touching_tiles = this.get_touching_tiles([ orientation, board, word ]);
 
-        return validate_all_words( all_words );
+        let touching_words = this.get_touching_words( [orientation, board, touching_tiles] );
+        touching_words.push( word );
+
+        return validate_all_words( touching_words );
 
     }
 
