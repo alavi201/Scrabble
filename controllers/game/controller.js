@@ -162,12 +162,13 @@ const game_controller = () => {
         this.column = column;
     }
 
-    function Tile(xCoordinate, yCoordinate, letter, game_tile_id){
+    function Tile(xCoordinate, yCoordinate, letter, score, game_tile_id){
         this.row = xCoordinate;
         this.column = yCoordinate;
         this.value = letter;
         this.is_new = false;
         this.game_tile_id = game_tile_id;
+        this.score = score
     }
 
     this.initialize_game_board = () =>{
@@ -189,9 +190,11 @@ const game_controller = () => {
             let board = this.initialize_game_board();
             if( result.length >= 1 ){
                 result.forEach( (tile) => {
-                    boardTile = board[tile.xCoordinate][tile.yCoordinate];
-                    let game_tile = new Tile( tile.xCoordinate, tile.yCoordinate, LETTER_VALUES[tile.tileId], tile.id)
-                    boardTile.letter = game_tile;
+                    if(tile.xCoordinate != 0 && tile.yCoordinate !=0) {
+                        let boardTile = board[tile.xCoordinate][tile.yCoordinate];
+                        let game_tile = new Tile( tile.xCoordinate, tile.yCoordinate, LETTER_VALUES[tile.tileId].value,  LETTER_VALUES[tile.tileId].score, tile.id)
+                        boardTile.letter = game_tile;
+                    }
                 }, this);
                 return ( [letters, orientation, board ] );
             }
@@ -347,7 +350,7 @@ const game_controller = () => {
                 let rack = []; 
                 
                 result.forEach( (letter) => {
-                    let rack_tile = new Tile( letter.xCoordinate, letter.yCoordinate, LETTER_VALUES[letter.tileId], letter.id)
+                    let rack_tile = new Tile( letter.xCoordinate, letter.yCoordinate, LETTER_VALUES[letter.tileId].value, LETTER_VALUES[letter.tileId].score, letter.id)
                     rack.push(rack_tile);                   
                 }, this);  
 
