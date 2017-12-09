@@ -28,8 +28,8 @@ block content
             th.rack.head(colspan='7') Rack
         tbody
           tr
-            each val in ['D', 'B', 'V', 'Z', 'Q', '', 'E']
-              td.rack.letter= val
+            each tile in rack
+              td.rack.letter=tile.value
       br
 
       div.col-sm-9
