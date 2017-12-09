@@ -23,8 +23,9 @@ const game_controller = () => {
 
     //TODO implement this function
     //Store the message in database
-    this.process_message = message_data => {
+    this.process_message = (message_data, user_id) => {
         return new Promise(( resolve, reject ) => {
+            message_data = user_id + " : " + message_data;
             resolve( message_data );
         })
     };
@@ -219,10 +220,7 @@ const game_controller = () => {
     this.mark_as_old_player = ( user_id, game_id ) => {
 
         return new Promise(( resolve, reject ) => {
-            this.get_game_board(game_id).then(result =>
-                resolve( true )
-            );
-            
+            resolve( true );
         });
         //return queries.mark_as_old_player( user_id, game_id )
     };
