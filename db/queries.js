@@ -34,6 +34,13 @@ const queries = database => {
          })
      };
 
+    this.select_player_rack = (user_id, game_id) =>{
+        return database.any('SELECT * FROM game_tiles WHERE "playerId" = $1 and "gameId" = $2 and "xCoordinate" = 0 and "yCoordinate" = 0',[user_id,game_id])
+         .then( data  => {
+             return data;
+         })
+    };
+
     return this;
 };
 module.exports = queries;
