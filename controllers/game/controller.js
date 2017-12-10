@@ -346,20 +346,80 @@ const game_controller = () => {
         return queries.select_player_rack(user_id, game_id)
         .then( (result)  => {
             if( result.length >= 1 ){
-                
                 let rack = []; 
-                
                 result.forEach( (letter) => {
                     let rack_tile = new Tile( letter.xCoordinate, letter.yCoordinate, LETTER_VALUES[letter.tileId].value, LETTER_VALUES[letter.tileId].score, letter.id)
                     rack.push(rack_tile);                   
                 }, this);  
-
                 return rack;
             }
             else{
                 return false;
             }
         })
+    }
+
+    this.get_unused_tiles = (game_id, tiles_to_swap) => {
+        return queries.get_unused_tiles(game_id, tiles_to_swap.length)
+        .then( (result)  => {
+            if( result.length >= 1 ){
+                
+                let replaced_tiles = []; 
+                
+                result.forEach( (letter) => {
+                    let tile = new Tile( letter.xCoordinate, letter.yCoordinate, LETTER_VALUES[letter.tileId].value, LETTER_VALUES[letter.tileId].score, letter.id)
+                    replaced_tiles.push(tile);                   
+                }, this);  
+
+                return replaced_tiles;
+            }
+            else{
+                return false;
+            }
+        })
+    }
+
+    this.can_swap = (available_tiles, tiles_to_swap) => {
+        if(available_tiles[0].total >= tiles_to_swap.length)
+            return true;
+        else
+            return false;
+    }
+
+    this.get_tile_id = (tiles) => {
+        let id = '';
+        tiles.forEach( (tile) => {
+            id += tile.game_tile_id +','; 
+        }, this);  
+        id = id.slice(0, -1);
+        return id;
+    }
+
+    this.clear_tile_association = (can_swap, tiles_to_swap ) => {
+        
+        if(can_swap){
+            let tile_id = this.get_tile_id(tiles_to_swap);
+            return queries.clear_tile_association(tile_id);
+        }
+        else
+            return false;
+    }
+
+    this.assign_tile_user = (user_id, swapped_tiles ) => {
+        let tile_id = this.get_tile_id(swapped_tiles);
+        return queries.assign_tile_user(user_id, tile_id)
+        .then(result => {
+            return swapped_tiles;
+        });
+    }
+
+    this.swap_user_tiles = (user_id, game_id, tiles_to_swap) => {
+        return queries.get_remaining_tile_count(game_id)
+            .then(data => this.can_swap(data, tiles_to_swap))
+            .then(result => this.clear_tile_association(result, tiles_to_swap))
+            .then(_ => this.get_unused_tiles(game_id, tiles_to_swap))
+            .then(swapped_tiles => this.assign_tile_user(user_id, swapped_tiles ));
+            
     }
 
     return this;

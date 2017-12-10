@@ -5,5 +5,6 @@ const DISCONNECT = 'disconnect';
 const INVALID_MOVE = 'invalid move';
 const NO_DATA = 'no data';
 const RACK = 'rack';
+const SWAP = 'swap';
 
-module.exports = { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, RACK };
+module.exports = { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP };

@@ -29,13 +29,15 @@ block content
         tbody
           tr
             each tile in rack
-              td.rack.letter=tile.value
+              td.rack.letter(data-row_id=tile.game_tile_id)=tile.value
       br
 
       div.col-sm-9
         button.col-sm-3(id='play') Play
-        button.col-sm-3 Swap
+        button.col-sm-3(id='swap') Swap
         button.col-sm-3 Pass
+        br
+        button.col-sm-9.confirmation Confirm Action
 
     div.col-sm-3
       div
@@ -55,11 +57,23 @@ block content
     const socket = io();
 
     current_play = [];
+    tiles_to_swap = [];
 
     $(function () {
       socket.on('chat message', function(msg){
+        debugger;
         $('#messages').append($('<li>').text(msg));
         window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      socket.on('swap', function(swapped_tiles){
+        //debugger;
+        console.log(swapped_tiles);
+
+        $('.swapped').each(function(i, letter){
+          $(this).html(swapped_tiles[i].value);
+        });
+        
       });
 
       socket.on('tile', function(word){
@@ -78,6 +92,7 @@ block content
         //window.scrollTo(0, document.body.scrollHeight);
       });
 
+
       $('form').submit(function(e){
         e.preventDefault();
         $('#messages').append($('<li>').text( $('#m').val()));
@@ -86,7 +101,7 @@ block content
         return false;
       });
 
-      $('.rack.letter').on('click',function(){
+      $(document).on('click', '.rack.letter', function(){
         
         $('.rack.letter').removeClass('active');
         $(this).addClass('active');
@@ -117,6 +132,27 @@ block content
           $(this).html(String.fromCharCode(Math.floor(Math.random() * 26) + 65));
         });
         current_play = [];
+        return false;
+      })
+
+      $('#swap').on('click',function(){
+          $('.rack.letter').removeClass('letter').addClass('swappable');
+      })
+
+      $(document).on('click', '.rack.swappable',function(){
+        $(this).addClass('swapped');
+        $(this).css('background-color','#f7f6a8');
+
+        let letter = new Object();
+        letter.game_tile_id = $(this).data('row_id');
+        tiles_to_swap.push(letter);
+      });
+
+      $('.confirmation').on('click',function(){
+        
+        socket.emit('swap',tiles_to_swap);
+        console.log(tiles_to_swap);
+        tiles_to_swap = [];
         return false;
       })
 
