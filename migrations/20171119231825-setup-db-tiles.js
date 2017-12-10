@@ -14,7 +14,7 @@ module.exports = {
           allowNull: false
         },
         letter: {
-          type: Sequelize.CHAR,
+          type: Sequelize.STRING,
           allowNull: false,
           unique: true
         }
