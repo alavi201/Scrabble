@@ -1,64 +1,6 @@
 extends layout
 
 block content
-<<<<<<< HEAD
-  
-    nav.navbar.navbar-default.navbar-fixed-top
-        .container
-            .navbar-header
-                h2 logo
-            .navbar-collapse
-                ul.navbar-right
-                  .ui.stacked.segment
-                    .field
-                      .ui.input
-                          a(href='#') Lobby
-                          a(href='#') My Account
-                          a(href='/logout') Logout
-
-                            
-    .container-fluid.scrollable.col-md-12
-        .left-section.col-md-8
-            form(method='POST' action='')
-                .border-create-game.col-md-8
-                    h1 Create New Game
-                    .select-players
-                      | Select Players
-                      |&nbsp;
-                      select(name="playervalue")
-                        option(value=2) 2
-                        option(value=3) 3
-                        option(value=4) 4
-                    .column
-                        button.btn.btn-primary(type='submit') Create Game
-                .column-list-games
-                  table
-                    thead
-                      tr
-                        th.rack.head(colspan='4') Games
-                        tr
-                        each val in ['Created By','Number of Players','Status','Join']
-                          td.next.value= val 
-                    tbody
-                      each row in games
-                        tr
-                          td.game_row.value= row.creator_id
-                          td.game_row.value=row.num_players
-                          td.game_row.value=row.status
-                          td.game_row
-        .right-section.col-md-4
-            table
-              thead
-                tr
-                  th.rack.head(colspan='3') Leadership Board
-              tbody
-                tr
-                  each val in ['Name','Win%','Score']
-                    td.next.value= val
-            h2 Chat
-            div.chatwindow
-              ul#messages                  
-=======
                         
   .container-fluid.scrollable
       .right-section
@@ -99,6 +41,5 @@ block content
                         td.game_row.value= row.creator_id
                         td.game_row.value=row.num_players
                         td.game_row.value=row.status
->>>>>>> master
 
 
