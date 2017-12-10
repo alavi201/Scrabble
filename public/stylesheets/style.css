@@ -2,7 +2,7 @@ html, body {
   height: 100%; 
 }
 body {
-  padding-top: 87px;
+  padding-top: 70px;
   padding-bottom: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
@@ -20,7 +20,7 @@ body {
 
 .ui.input{
   padding-left: 30px;
-  padding-top: 25px;
+  padding-top: 20px;
 }
 
 .margin-right-1{
@@ -44,10 +44,12 @@ a {
 table, th, td {
   border: 1px solid black;
   padding-bottom: 30px;
+  zoom:90%;
 }
 
 td {
-  min-width:35px
+  width:35px;
+  height:35px;
 }
 
 th.rack.head{
@@ -55,7 +57,9 @@ th.rack.head{
 }
 
 td.rack{
-  min-width: 75px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
   text-align: center;
 }
 
@@ -82,4 +86,369 @@ td.rack{
 
 .select-players {
     padding-bottom: 10px;
+}
+
+table.board { 
+  background: url("https://i.pinimg.com/originals/ca/8a/73/ca8a73c6203284c97dab994e20dad4cb.jpg") no-repeat; 
+  background-size: 100% 100%;
+  table-layout: fixed;
+}
+
+table td.board_tile.placed_tile{
+  zoom:18%;
+}
+
+.c {
+  background: url("https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg") -430px -40px no-repeat;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.rack-tile{
+  zoom:25%;
+}
+
+button.btn{
+  margin:5px;
+}
+
+nav.navbar{
+  height: 50px;
+}
+
+nav h2{
+  margin-top:10px;
+}
+
+table#rack-holder td.rack.letter{
+  width:155px;
+  zoom:30%;
+}
+
+
+
+.a {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -50px -40px;
+  display: table-cell;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.b {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -240px -40px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+.c {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -430px -40px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.d {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -620px -40px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.e {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -810px -40px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.f {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -1000px -40px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.g {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -1190px -40px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.h {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -50px -227px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+.i {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -240px -227px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+.j {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -430px -227px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+.k {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -620px -227px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.l {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -810px -227px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+.m {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -1000px -227px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+.n {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -1190px -227px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+.o {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -50px -419px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.p {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -240px -419px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.q {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -430px -419px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+
+.r {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -620px -419px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+
+.s {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -810px -419px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+
+.t {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -1000px -419px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+
+.u {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -1190px -419px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.v {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -50px -606px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.w {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -240px -606px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.x {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -430px -606px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.y {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -620px -606px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.z {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -810px -606px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.blank {
+  background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
+  -1000px -606px;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
 }

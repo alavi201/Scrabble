@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller')();
-const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED } = require('../../constants/events');
+const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK } = require('../../constants/events');
 
 
 const game = app => {
@@ -18,11 +18,11 @@ const game = app => {
 
       controller.validate_user_with_game( user_id, game_id )
       .then( (validated) => {
-        Promise.all([
-          add_socket_events( game_id, user_id ),
-          show_page( validated, response, next, game_id, user_id )
-        ])
-      })
+        if( validated ){
+          add_socket_events( game_id, user_id, request );
+          show_page( validated, response, next, game_id, user_id, request );
+        }
+      });
     }
     catch( error ){
       response.json( error );
@@ -31,25 +31,21 @@ const game = app => {
     
   });
 
-  const show_page = ( validated, response, next, game_id, user_id ) => {
+  const show_page = ( validated, response, next, game_id, user_id, request ) => {
     if ( validated ){
-      Promise.all([
-        controller.get_game_board([0, 0], game_id),
-        controller.get_player_rack([user_id, game_id])
-      ])
+      return controller.get_game_board([0, 0], game_id)
       .then( result => {
-        if( result[1] ){
-          response.render('game', { title: 'Game', game_board: result[0][2], rack: result[1] });    
+        if( result[2] ){
+          response.render('game', { title: 'Game', game_board: result[2]});
         }
         else{
-          response.render('game', { title: 'Game', game_board: result[0][2] });
+          response.render('game', { title: 'Game' });
         }
-        
       });
     }
   }
   
-  const add_socket_events = ( game_id, user_id ) => {
+  const add_socket_events = ( game_id, user_id, request ) => {
     root_io = app.get('io');
     io = root_io.of('/game');
     io.on( CONNECTION, socket => {
@@ -59,13 +55,19 @@ const game = app => {
       }
       socket.room = game_id;
       socket.join( socket.room );
+      request.session.game_socket = socket;
       
       socket.on( CHAT_MESSAGE, data => process_chat_message(data, user_id, socket, io) );
       socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
       socket.on( SWAP, data=> swap(data, game_id, user_id, socket));
+
+      controller.get_player_rack([user_id, game_id])
+      .then( rack => socket.emit( CREATE_RACK, rack));
+      
       socket.on( DISCONNECT, () => {
         console.log( 'socket disconnected' );
       }); 
+      
     });
   };
 

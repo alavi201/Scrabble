@@ -9,7 +9,7 @@ module.exports = {
           primaryKey: true,
           autoIncrement: true
         },
-        creatorId: {
+        creator_id: {
           type: Sequelize.BIGINT,
           allowNull: false,
           references: {
@@ -17,7 +17,7 @@ module.exports = {
             key: 'id'
           }
         },
-        numPlayers: {
+        num_players: {
           type: Sequelize.BIGINT,
           allowNull: false
         },
@@ -25,13 +25,13 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: false
         },
-        createdAt: {
+        created_at: {
           type: Sequelize.DATE,
           allowNull: false
         },
-        updatedAt: {
+        updated_at: {
           type: Sequelize.DATE,
-          allowNull: false
+          allowNull: true
         }
       }
     );

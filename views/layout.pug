@@ -13,13 +13,26 @@ html
   body
   
     block content
-    block foot
-      nav.navbar.navbar-default.navbar-fixed-bottom
+    //- block foot
+    //-   nav.navbar.navbar-default.navbar-fixed-bottom
+    //-     .container
+    //-       .navbar-header
+    //-         a(href='/termsConditions') Terms and Conditions
+    //-       .navbar-collapse
+    //-         ul.navbar-right
+    //-           a(href='/help') Help
+    //-         ul.navbar-left
+              a(href='/about') About Us
+    block head
+      nav.navbar.navbar-default.navbar-fixed-top
         .container
-          .navbar-header
-            a(href='#') Terms and Conditions
-          .navbar-collapse
-            ul.navbar-right
-              a(href='#') Help
-            ul.navbar-left
-              a(href='#') About Us
+            .navbar-header
+                h2 Scrabble
+            .navbar-collapse
+                ul.navbar-right
+                  .ui.stacked.segment
+                    .field
+                      .ui.input
+                          a(href='/lobby') Lobby
+                          a(href='#') My Account
+                          a(href='/logout') Logout
