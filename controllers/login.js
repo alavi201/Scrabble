@@ -44,8 +44,6 @@ const login = app => {
         }
         else if(req.body.loginType=='login'){
             validateUser(req,res);
-            //console.log(req.session.player_id);
-            //console.log(req.session.user);
         }
         console.log(req.body.loginType);
         

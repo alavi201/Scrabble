@@ -30,9 +30,11 @@ html
                 h2 logo
             .navbar-collapse
                 ul.navbar-right
-                  .ui.stacked.segment
-                    .field
-                      .ui.input
-                          a(href='#') Lobby
-                          a(href='#') My Account
-                          a(href='/logout') Logout
+                    form(method='POST',action='')
+                            .ui.stacked.segment
+                                .field
+                                    .ui.input
+                                        input(type="text", name="username", placeholder="Username")
+                                        input(type="password",  name="password", placeholder="Password")
+                                        input(type="hidden", name="loginType", value="login")
+                                button.btn.btn-primary(type='submit') Login
