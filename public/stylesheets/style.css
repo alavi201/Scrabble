@@ -70,3 +70,7 @@ td.rack{
   padding-bottom: 30px;
   padding-left: 30px;
 }
+
+.navbar{
+  min-height: 10px !important;
+}

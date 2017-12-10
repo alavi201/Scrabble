@@ -15,10 +15,12 @@ block content
                                         input(type="text", name="username", placeholder="Username")
                                         input(type="password",  name="password", placeholder="Password")
                                         input(type="hidden", name="loginType", value="login")
-                                button.btn.btn-primary(type='submit') Login
+                                        button.btn.btn-primary(type='submit') Login
                             
-    .container-fluid.scrollable
-        .right-section
+    .container-fluid.scrollable.col-md-12
+        .left-section.col-md-8
+            img(src="/images/scrabble.jpg", alt="scrabble board",height="500")
+        .right-section.col-md-4
             form(method='POST' action='')
                 h1 Sign Up!
                 .column
@@ -35,5 +37,3 @@ block content
                     input(type="hidden", name="loginType", value="signup") 
                 .column
                     button.btn.btn-primary(type='submit') Sign Up
-        .left-section
-            img(src="/images/scrabble.jpg", alt="scrabble board")
