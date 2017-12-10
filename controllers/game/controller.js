@@ -111,7 +111,6 @@ const game_controller = () => {
     }
 
     this.sort_accordingly = ( data, orientation ) => {
-
         sorted_letters = data.sort( (a, b) => {
             if (orientation === FLOW_LEFT_TO_RIGHT){
                 return a.column - b.column;
@@ -197,6 +196,9 @@ const game_controller = () => {
                         boardTile.letter = game_tile;
                     }
                 }, this);
+                return ( [letters, orientation, board ] );
+            }
+            else{
                 return ( [letters, orientation, board ] );
             }
         })

@@ -36,7 +36,15 @@ const game = app => {
         controller.get_game_board([0, 0], game_id),
         controller.get_player_rack([user_id, game_id])
       ])
-      .then( result => response.render('game', { title: 'Game', game_board: result[0][2], rack: result[1] }));
+      .then( result => {
+        if( result[1] ){
+          response.render('game', { title: 'Game', game_board: result[0][2], rack: result[1] });    
+        }
+        else{
+          response.render('game', { title: 'Game', game_board: result[0][2] });
+        }
+        
+      });
     }
   }
   
