@@ -15,7 +15,6 @@ const joinGame = app => {
         res.redirect('/game');   
     });
     router.post('/',function(req, res, next) { 
-        console.log(req.body.gameId);
         res.redirect('/game');   
     });
     return router;

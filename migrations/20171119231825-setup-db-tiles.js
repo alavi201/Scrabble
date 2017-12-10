@@ -17,6 +17,10 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: false,
           unique: true
+        },
+        count:{
+          type: Sequelize.INTEGER,
+          allowNull: false
         }
       }
 
