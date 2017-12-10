@@ -36,11 +36,12 @@ const login = app => {
         if(req.body.loginType=='signup'){
             database.insert_new_user(req,res)
             .then((result) => {
-                res.redirect('/lobby')
+                validateUser(req,res);
             })
             .catch((err) => {
                 res.render('/login',{ errormsg: true});
             })
+            
         }
         else if(req.body.loginType=='login'){
             validateUser(req,res);
@@ -53,11 +54,9 @@ const login = app => {
     {
         database.validateUser(req,res)
         .then((data) => {
-
+        
         username  = req.body.username;
         req.session.user = req.body.username;
-        //req.session.admin = true;
-        //console.log(data.id);
         req.session.player_id = data.id;
         req.session.save();
 
