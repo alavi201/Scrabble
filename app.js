@@ -17,6 +17,7 @@ var app = express();
 var game = require('./controllers/game')(app);
 var login = require('./controllers/login')(app);
 var lobby = require('./controllers/lobby')(app);
+var logout = require('./controllers/logout')(app);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -36,6 +37,7 @@ app.use('/tests', tests);
 app.use('/game', game);
 app.use('/login', login);
 app.use('/lobby',lobby);
+app.use('/logout',logout);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

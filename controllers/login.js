@@ -4,7 +4,19 @@ const db = require('../db');
 const dbjs = require('../db/tempQueries')
 const database = new dbjs(db)
 session = require('express-session');
+let username
 
+const auth = function(req, res, next) {
+    
+    if (req.session && (req.session.user === username) && req.session.admin)
+    {
+        return next();
+    }
+    else
+    {
+        return res.render('login',{errormsg: false});
+    }
+};
 
 const login = app => {
 
@@ -14,8 +26,9 @@ const login = app => {
         saveUninitialized: true
     }));
 
-    router.get('/', function(req, res, next) {
-        res.render('login', { title: 'Login Page' });    
+    router.get('/', auth,function(req, res, next) {
+        //res.render('login', { title: 'Login Page' }); 
+        response.redirect('/lobby');   
     });
 
     router.post('/', function(req,res,next){
@@ -45,7 +58,7 @@ const login = app => {
 
         username  = req.body.username;
         req.session.user = req.body.username;
-        req.session.admin = true;
+        //req.session.admin = true;
         //console.log(data.id);
         req.session.player_id = data.id;
         req.session.save();
