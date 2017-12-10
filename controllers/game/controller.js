@@ -351,6 +351,7 @@ const game_controller = () => {
                     let rack_tile = new Tile( letter.xCoordinate, letter.yCoordinate, LETTER_VALUES[letter.tileId].value, LETTER_VALUES[letter.tileId].score, letter.id)
                     rack.push(rack_tile);                   
                 }, this);  
+                console.log(rack);
                 return rack;
             }
             else{

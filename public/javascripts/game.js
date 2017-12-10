@@ -5,14 +5,15 @@ let socket;
 function attach_sockect_events( socket ){
     socket.on('tile', tile_broadcast_received);
     socket.on('swap', swap_received);
+    socket.on('create rack', create_rack);
 }
 
 function swap_received(swapped_tiles){
     $('.swapped').each(function(i, letter){
       $(this).html(swapped_tiles[i].value);
-    });
-    
-  }
+      $(this).html(swapped_tiles[i]).addClass( swapped_tiles[i].value.toLowerCase() )
+    }); 
+}
 
 function add_events( socket ){
     $('#play').on('click', play_clicked(socket));
@@ -38,18 +39,22 @@ function play_clicked( socket ){
 }
 
 function rack_letter_clicked(){
+    console.log('clicked rack letter')
     $('.rack.letter').removeClass('active');
     $(this).addClass('active');
 }
     
 function board_tile_clicked(){  
+    debugger;
     let active_letter = $('.rack.letter.active');
-    $(this).html($('.rack.letter.active').text());
+    $(this).addClass(active_letter.val().toLowerCase());
+    $(this).val(active_letter.val());
     let letter = new Object();
     letter.row = $(this).data('row');
     letter.column = $(this).data('column');
-    letter.value = active_letter.text();
-    active_letter.text('');
+    letter.value = active_letter.val();
+    active_letter.removeClass(active_letter.val().toLowerCase());
+    active_letter.val("");
     active_letter.addClass('empty');
     current_play.push(letter);
 }
@@ -85,4 +90,29 @@ function confirmation_clicked(){
     console.log(tiles_to_swap);
     tiles_to_swap = [];
     return false;
+}
+
+function create_rack( rack ){
+    let table = document.getElementById("rack-holder");
+    let tbody = document.createElement('tbody');
+    let tr = document.createElement("tr");
+    console.log(rack);
+    rack.forEach( (tile) => {        
+        let td = document.createElement("td");
+        td.className += 'rack ';
+        td.className += 'letter ';
+        if( tile.value == " " ){
+            td.className += 'blank';
+        } 
+        else{
+           td.className += tile.value.toLowerCase();
+        }
+        td.value = tile.value;
+        td.addEventListener('click', rack_letter_clicked);
+        td.setAttribute('data-row_id', tile.game_tile_id);   
+        tr.appendChild(td);
+        
+    }, this)
+    tbody.appendChild(tr);
+    table.appendChild(tbody);
 }
