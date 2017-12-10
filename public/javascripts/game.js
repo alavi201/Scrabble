@@ -1,14 +1,30 @@
 let current_play = [];
+let tiles_to_swap = [];
 let socket;
 
 function attach_sockect_events( socket ){
     socket.on('tile', tile_broadcast_received);
+    socket.on('swap', swap_received);
 }
+
+function swap_received(swapped_tiles){
+    $('.swapped').each(function(i, letter){
+      $(this).html(swapped_tiles[i].value);
+    });
+    
+  }
 
 function add_events( socket ){
     $('#play').on('click', play_clicked(socket));
     $('.rack.letter').on('click', rack_letter_clicked);
-    $('.board_tile').on('click', board_tile_clicked)
+    $('.board_tile').on('click', board_tile_clicked);
+    $('#swap').on('click', swap_clicked);
+    $(document).on('click', '.rack.swappable',rack_swappable_clicked);
+    $('.confirmation').on('click', confirmation_clicked);
+}
+
+function swap_clicked(){
+    $('.rack.letter').removeClass('letter').addClass('swappable');
 }
 
 function play_clicked( socket ){        
@@ -54,3 +70,19 @@ $(document).ready(function() {
     add_events(socket);
     
 });
+
+function rack_swappable_clicked(){
+    $(this).addClass('swapped');
+    $(this).css('background-color','#f7f6a8');
+
+    let letter = new Object();
+    letter.game_tile_id = $(this).data('row_id');
+    tiles_to_swap.push(letter);
+}
+
+function confirmation_clicked(){
+    socket.emit('swap',tiles_to_swap);
+    console.log(tiles_to_swap);
+    tiles_to_swap = [];
+    return false;
+}

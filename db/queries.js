@@ -47,6 +47,32 @@ const queries = database => {
             return data;
         });
     };
+    this.get_unused_tiles = (game_id, tile_count) => {
+        return database.any('SELECT * FROM game_tiles WHERE "gameId" = $1 AND "playerId" is null  ORDER BY random() LIMIT $2', [game_id, tile_count])
+        .then( data  => {
+            return data;
+        })
+    }
+
+    this.get_remaining_tile_count = (game_id) => {
+        return database.any('SELECT count(*) as total FROM game_tiles WHERE "gameId" = $1 AND "playerId" is null', [game_id])
+        .then( data  => {
+            return data;
+        })
+    }
+
+    this.clear_tile_association = (tile_id) => {
+        return database.any('UPDATE game_tiles SET "playerId" = NULL WHERE  "id" = any(string_to_array($1,\',\')::integer[])', [tile_id])
+        .then( ()  => {
+        })
+    }    
+
+    this.assign_tile_user = (user_id, tile_id) => {
+        return database.any('UPDATE game_tiles SET "playerId" = $1 WHERE "id" = any(string_to_array($2,\',\')::integer[])', [user_id, tile_id])
+        .then( ()  => {
+        })
+    }    
+
     return this;
 };
 module.exports = queries;

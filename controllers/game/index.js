@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller')();
-const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, RACK, CHAT_RECEIVED } = require('../../constants/events');
+const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED } = require('../../constants/events');
+
 
 const game = app => {
   
@@ -61,7 +62,7 @@ const game = app => {
       
       socket.on( CHAT_MESSAGE, data => process_chat_message(data, user_id, socket, io) );
       socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
-      socket.on( RACK, data=> get_player_rack(userId, game_id));
+      socket.on( SWAP, data=> swap(data, game_id, user_id, socket));
       socket.on( DISCONNECT, () => {
         console.log( 'socket disconnected' );
       }); 
@@ -86,8 +87,26 @@ const game = app => {
 
   };
 
-  const process_chat_message = (data, user_id, socket, io ) => {
-    return controller.process_message( data, user_id )
+  const swap = (data, game_id, user_id, socket) => {
+    if( data.length !== 0 ){
+      return controller.swap_user_tiles( user_id, game_id, data )
+      .then (swapped_tiles => {
+          if(swapped_tiles) {
+            socket.emit( SWAP, swapped_tiles );
+          }
+          else {
+            socket.in( socket.room ).emit( INVALID_MOVE, data );
+          }
+      })
+    }
+    else{
+      socket.in( socket.room ).emit( NO_DATA, data );
+    }
+
+  }; 
+
+  const process_chat_message = (data, user_id, socket, io) => {
+    return controller.process_message( data, user_id)
     .then( data => {
       io.in( socket.room ).emit(CHAT_RECEIVED, data);
     })

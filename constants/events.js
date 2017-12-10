@@ -4,10 +4,13 @@ const CONNECTION = 'connection';
 const DISCONNECT = 'disconnect';
 const INVALID_MOVE = 'invalid move';
 const NO_DATA = 'no data';
-const RACK = 'rack';
 const CHAT_RECEIVED = 'server chat sent';
+const SWAP = 'swap';
 
-module.exports = { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, RACK, CHAT_RECEIVED };
+module.exports = { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED };
+
+
+
 
 
 
