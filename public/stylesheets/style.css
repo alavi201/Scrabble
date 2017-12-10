@@ -18,9 +18,14 @@ body {
   background: rgb(255, 255, 255);
 }
 
-/*.ui.input{
+.ui.input{
   padding-left: 30px;
-}*/
+  padding-top: 25px;
+}
+
+.margin-right-1{
+    margin-right: 5px;
+}
 
 .right-section{
   float: right;
@@ -28,11 +33,7 @@ body {
 }
 
 .left-section{
-  float: left;
   width: 60%;
-}
-.ui.input {
-  padding-top: 25px;
 }
 
 a {
@@ -68,7 +69,6 @@ td.rack{
 
 .column{
   padding-bottom: 30px;
-  padding-left: 30px;
 }
 
 .navbar{
