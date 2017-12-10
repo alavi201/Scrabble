@@ -73,6 +73,16 @@ const queries = database => {
         })
     }    
 
+    this.load_tiles = () => {
+        return database.any('SELECT * FROM tiles')
+        .then((data) =>{
+            return data;
+        })
+    }
+
+    this.populate_game_tiles = (game_id, tile) => {
+        return database.any('INSERT INTO game_tiles ("gameId", "tileId", "playerId", "xCoordinate", "yCoordinate") SELECT $1,$2,NULL,0,0 FROM generate_series(1,$3)', [game_id, tile.id, tile.count]);
+    }    
     return this;
 };
 module.exports = queries;
