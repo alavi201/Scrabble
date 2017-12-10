@@ -13,9 +13,11 @@ router.get('/', function(req, res, next) {
     session=req.session;
 
     if(session.user){
+        //console.log('before sendGame');
         sendGameDetails(req,res);
     }
     else{
+        //console.log('before redirect to login');
         res.redirect('/login');
     }
         
@@ -23,14 +25,18 @@ router.get('/', function(req, res, next) {
 
 router.post('/', function(req, res, next) {
 
+    console.log('in post lobby');
     database.insert_new_game(req,res)
-    .then((result) => sendGameDetails(req,res));
-    //console.log(req.session.user);
+    .then((result) => {
+        //console.log(result.id);
+        database.insert_game_user(result.id,req,res)
+        sendGameDetails(req,res)
+    });
 });
 
 function sendGameDetails(req, res)
 {
-    console.log( 'send game details');
+    //console.log( 'send game details');
     database.get_games(req,res)
     .then((data) => {
     

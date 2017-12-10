@@ -28,6 +28,7 @@ block content
               .column
                 button.btn.btn-primary(type='submit') Create Game
               .column
+              form(method='POST' action='/joinGame')
                 table
                   thead
                     tr
@@ -41,5 +42,7 @@ block content
                         td.game_row.value= row.creator_id
                         td.game_row.value=row.num_players
                         td.game_row.value=row.status
+                        td
+                          a(href='/joinGame/'+row.id) Join
 
 
