@@ -21,9 +21,10 @@ block content
                   else if tile.premium != 0
                     td.board_tile(data-row=tile.row, data-column=tile.column)= tile.premium
                   else
-                    td.board_tile(data-row=tile.row, data-column=tile.column)= '.'
+                    td.board_tile(data-row=tile.row, data-column=tile.column)
       br
-      table#rack-holder
+      .col-sm-11.col-sm-push-1
+        table#rack-holder
         //- thead
         //-   tr
         //-     th.rack.head(colspan='7') Rack

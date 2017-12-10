@@ -39,23 +39,24 @@ function play_clicked( socket ){
 }
 
 function rack_letter_clicked(){
-    console.log('clicked rack letter')
     $('.rack.letter').removeClass('active');
     $(this).addClass('active');
 }
     
 function board_tile_clicked(){  
-    debugger;
     let active_letter = $('.rack.letter.active');
+    $(this).addClass("placed_tile");
     $(this).addClass(active_letter.val().toLowerCase());
     $(this).val(active_letter.val());
+    $(this).off('click', board_tile_clicked);
     let letter = new Object();
     letter.row = $(this).data('row');
     letter.column = $(this).data('column');
+    console.log("ROW: "+letter.row+" col: "+letter.column);
     letter.value = active_letter.val();
     active_letter.removeClass(active_letter.val().toLowerCase());
-    active_letter.val("");
-    active_letter.addClass('empty');
+    // active_letter.val("");
+    // active_letter.addClass('empty');
     current_play.push(letter);
 }
    
@@ -97,7 +98,9 @@ function create_rack( rack ){
     let tbody = document.createElement('tbody');
     let tr = document.createElement("tr");
     console.log(rack);
-    rack.forEach( (tile) => {        
+    var count = 7;
+    rack.forEach( (tile) => {   
+        if(count-- >0){
         let td = document.createElement("td");
         td.className += 'rack ';
         td.className += 'letter ';
@@ -111,7 +114,7 @@ function create_rack( rack ){
         td.addEventListener('click', rack_letter_clicked);
         td.setAttribute('data-row_id', tile.game_tile_id);   
         tr.appendChild(td);
-        
+    }
     }, this)
     tbody.appendChild(tr);
     table.appendChild(tbody);
