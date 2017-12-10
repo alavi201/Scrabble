@@ -4,12 +4,12 @@ block content
   script(type="text/javascript", src="/socket.io/socket.io.js")
   script(type="text/javascript", src="/javascripts/chat.js")
   script(type="text/javascript", src="/javascripts/game.js")
-  h1= title
-  p Welcome to #{title}
-
+  //- h1= title
+  //- p Welcome to #{title}
+  
   div.container-fluid.col-sm-12
-    div.col-sm-9
-      table(id='board')
+    div.col-sm-7
+      table.board(id='board',style="margin-left:10%;")
         tbody 
           each row in game_board
             tr
@@ -23,28 +23,54 @@ block content
                   else
                     td.board_tile(data-row=tile.row, data-column=tile.column)= '.'
       br
-      br
-      h4 My Score: 34
       table
-        thead
-          tr
-            th.rack.head(colspan='7') Rack
+        //- thead
+        //-   tr
+        //-     th.rack.head(colspan='7') Rack
         tbody
           tr
             each tile in rack
               td.rack.letter(data-row_id=tile.game_tile_id)=tile.value
-      br
+      div.col-sm-12
+        br
+        button.col-sm-3.btn.btn-primary(id='play') Play
+        button.col-sm-3.btn.btn-warning(id='swap') Swap
+        button.col-sm-3.btn.btn-danger Pass
+        button.col-sm-9.btn.btn-success.confirmation Confirm Action
 
-      div.col-sm-9
-        button.col-sm-3(id='play') Play
-        button.col-sm-3(id='swap') Swap
-        button.col-sm-3 Pass
-        button.col-sm-9.confirmation Confirm Action
-
-    div.col-sm-3
-      div
-        h3 Remaining Tiles: 
+      
+    
+    //- div.col-sm-3
+    //-   br
+    //-   br
+    //-   h4 My Score: 34
+      
+      
+    //-   br
+    div.col-sm-5
+      table.col-sm-6
+        tbody 
+          tr
+            td abc
+            td pqr
+            td xyz
+            td mno          
+          tr
+            td 124
+            td 111
+            td 444
+            td 999    
+      div.col-sm-6
+        h5 Remaining Tiles: 
           p(id='tile_count') 56
 
       
-      include chat.pug
+      div.col-sm-10
+        include chat.pug
+    br
+    br
+    br
+      
+
+      
+      

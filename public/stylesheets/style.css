@@ -2,7 +2,7 @@ html, body {
   height: 100%; 
 }
 body {
-  padding-top: 87px;
+  padding-top: 70px;
   padding-bottom: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
@@ -20,7 +20,7 @@ body {
 
 .ui.input{
   padding-left: 30px;
-  padding-top: 25px;
+  padding-top: 20px;
 }
 
 .margin-right-1{
@@ -44,10 +44,12 @@ a {
 table, th, td {
   border: 1px solid black;
   padding-bottom: 30px;
+  zoom:90%;
 }
 
 td {
-  min-width:35px
+  width:35px;
+  height:35px;
 }
 
 th.rack.head{
@@ -82,4 +84,36 @@ td.rack{
 
 .select-players {
     padding-bottom: 10px;
+}
+
+table.board { 
+  background: url("https://i.pinimg.com/originals/ca/8a/73/ca8a73c6203284c97dab994e20dad4cb.jpg") no-repeat; 
+  background-size: 100% 100%;
+}
+
+.c {
+  background: url("https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg") -430px -40px no-repeat;
+  display: inline-block;
+  width: 155px;
+  height: 155px;
+  border-radius: 20px;
+  border: 2px solid black;
+  zoom: 38%;
+  margin: 19px;
+}
+
+.rack-tile{
+  zoom:25%;
+}
+
+button.btn{
+  margin:5px;
+}
+
+nav.navbar{
+  height: 50px;
+}
+
+nav h2{
+  margin-top:10px;
 }

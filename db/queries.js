@@ -28,14 +28,14 @@ const queries = database => {
     };
 
     this.select_placed_tiles = (game_id) =>{
-        return database.any('SELECT * FROM game_tiles WHERE "game_id" = $1',[game_id])
+        return database.any('SELECT * FROM game_tiles WHERE "gameId" = $1',[game_id])
          .then( data  => {
              return data;
          })
     };
 
     this.select_player_rack = (user_id, game_id) =>{
-        return database.any('SELECT * FROM game_tiles WHERE "player_id" = $1 and "game_id" = $2 and "xCoordinate" = 0 and "yCoordinate" = 0',[user_id,game_id])
+        return database.any('SELECT * FROM game_tiles WHERE "playerId" = $1 and "gameId" = $2 and "xCoordinate" = 0 and "yCoordinate" = 0',[user_id,game_id])
          .then( data  => {
              return data;
          })
