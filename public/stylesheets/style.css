@@ -1,14 +1,49 @@
+html, body {
+  height: 100%; 
+}
 body {
-  padding: 50px;
+  padding-top: 87px;
+  padding-bottom: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+.navbar-offset {
+  top: 37px; 
+}
+
+.container-fluid.scrollable {
+  padding-top: 30px;
+  height: 100%; 
+  overflow: auto; 
+  background: rgb(255, 255, 255);
+}
+
+.ui.input{
+  padding-left: 30px;
+  padding-top: 25px;
+}
+
+.margin-right-1{
+    margin-right: 5px;
+}
+
+.right-section{
+  float: right;
+  width: 30%;
+}
+
+.left-section{
+  width: 60%;
+}
+
 a {
-  color: #00B7FF;
+  padding-left: 30px;
+  color: rgb(0, 255, 21);
 }
 
 table, th, td {
   border: 1px solid black;
+  padding-bottom: 30px;
 }
 
 td {
@@ -25,8 +60,26 @@ td.rack{
 }
 
 .chatwindow{
+  padding-top: 30px;
   height: 325px;
   border: 1px solid black;
   overflow: scroll;
   
+}
+
+.column{
+  padding-bottom: 30px;
+}
+
+.navbar{
+  min-height: 10px !important;
+}
+
+.column-list-games {
+    float: left;
+    clear: both;
+}
+
+.select-players {
+    padding-bottom: 10px;
 }

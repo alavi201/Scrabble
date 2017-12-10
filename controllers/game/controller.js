@@ -6,31 +6,28 @@ const {LETTER_VALUES} = require('../../constants/letters');
 const game_controller = () => {
 
     this.validate_user_with_game = ( user_id, game_id ) => {
-       return queries.select_game_user( user_id, game_id )
-        .then( (result)  => {
-            if( result.length == 1 ){
-                return true;
-            }
-            else{
-                return false;
-            }
-        })
-    };
+        return queries.select_game_user( user_id, game_id )
+         .then( (result)  => {
+             if( result.length == 1 ){
+                 return true;
+             }
+             else{
+                 return false;
+             }
+         })
+     };
 
     this.is_new_player = ( user_id, game_id )  => {
         return queries.select_new_game_user( user_id, game_id )
     };
 
-    //TODO implement this function
-    //Store the message in database
-    this.process_message = message_data => {
+    this.process_message = (message_data, user_id) => {
         return new Promise(( resolve, reject ) => {
+            message_data = user_id + " : " + message_data;
             resolve( message_data );
         })
     };
 
-    //TODO Implement this function
-    // Add the already existing letters if they exist.
     this.validate_game_play = ( user_id, game_id, play_data ) => {
         return this.create_tiles( play_data )
         .then( this.get_orientation )
@@ -38,11 +35,8 @@ const game_controller = () => {
         .then( this.place_new_tiles )
         .then( this.find_starting_letter_accordingly )
         .then( this.extract_word )
-        //uncomment the below .then once get_touching_tiles is implemented
         .then( this.validate_move )
-        //and comment the below two .then
-        //.then( this.get_word_from_tiles )
-        //.then( validate_word_api )
+        
 
     };
 
@@ -100,17 +94,23 @@ const game_controller = () => {
     };
 
     this.check_sequence = ( sequence ) => {
-        let result = sequence.reduce( (a, b) => { return (a === b - 1) ? b : false });
-        return (result === false) ? false : true;
+        if( sequence.length > 0){
+            let result = sequence.reduce( (a, b) => { return (a === b - 1) ? b : false });
+            return (result === false) ? false : true;
+        }
+         return false;   
     }
 
     this.check_all_same = ( sequence ) => {
-        let result = sequence.reduce( (a, b) => { return (a === b) ? b : false });
-        return (result === false) ? false : true;
+        if( sequence.length > 0){
+            let result = sequence.reduce( (a, b) => { return (a === b) ? b : false });
+            return (result === false) ? false : true;
+        }
+        return false;
+        
     }
 
     this.sort_accordingly = ( data, orientation ) => {
-
         sorted_letters = data.sort( (a, b) => {
             if (orientation === FLOW_LEFT_TO_RIGHT){
                 return a.column - b.column;
@@ -198,6 +198,9 @@ const game_controller = () => {
                 }, this);
                 return ( [letters, orientation, board ] );
             }
+            else{
+                return ( [letters, orientation, board ] );
+            }
         })
     }
 
@@ -219,10 +222,7 @@ const game_controller = () => {
     this.mark_as_old_player = ( user_id, game_id ) => {
 
         return new Promise(( resolve, reject ) => {
-            this.get_game_board(game_id).then(result =>
-                resolve( true )
-            );
-            
+            resolve( true );
         });
         //return queries.mark_as_old_player( user_id, game_id )
     };

@@ -1,0 +1,38 @@
+extends layout
+
+block content
+    nav.navbar.navbar-default.navbar-fixed-top
+        .container
+            .navbar-header
+                h2 logo
+            .navbar-collapse
+                ul.navbar-right
+                    form(method='POST',action='')
+                            .ui.stacked.segment
+                                .field
+                                    .ui.input
+                                        input.margin-right-1(type="text", name="username", placeholder="Username") 
+                                        input.margin-right-1(type="password",  name="password", placeholder="Password") 
+                                        input.margin-right-1(type="hidden", name="loginType", value="login") 
+                                        button.btn.btn-primary.btn-sm(type='submit') Login
+                            
+    .container-fluid.scrollable.col-md-12
+        .left-section.col-md-8
+            img(src="/images/scrabble.jpg", alt="scrabble board",height="500")
+        .right-section.col-md-4
+            form(method='POST' action='')
+                h1 Sign Up!
+                .column
+                    input(type="text", name="name", placeholder="Name")
+                .column
+                    input(type="text", name="username", placeholder="Username")
+                .column
+                    input(type="text", name="email", placeholder="E-mail address") 
+                .column
+                    input(type="password", name="password", placeholder="Password") 
+                .column
+                    input(type="password", name="confirmPassword", placeholder="Password") 
+                .column
+                    button.btn.btn-primary.btn-lg(type='submit') Sign Up
+                .column
+                    input(type="hidden", name="loginType", value="signup")

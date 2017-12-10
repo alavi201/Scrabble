@@ -32,7 +32,7 @@ const queries = database => {
          .then( data  => {
              return data;
          })
-     };
+    };
 
     this.select_player_rack = (user_id, game_id) =>{
         return database.any('SELECT * FROM game_tiles WHERE "playerId" = $1 and "gameId" = $2 and "xCoordinate" = 0 and "yCoordinate" = 0',[user_id,game_id])
@@ -41,6 +41,12 @@ const queries = database => {
          })
     };
 
+    this.insert_message = ( user_id, message, date, game_id ) => {
+        return db.none('INSERT INTO messages ("userId","message","createdAt","gameId") VALUES ($1,$2,$3,$4);', [user_id, message, new Date(), game_id])
+        .then(data => {
+            return data;
+        });
+    };
     this.get_unused_tiles = (game_id, tile_count) => {
         return database.any('SELECT * FROM game_tiles WHERE "gameId" = $1 AND "playerId" is null  ORDER BY random() LIMIT $2', [game_id, tile_count])
         .then( data  => {
