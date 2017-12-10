@@ -432,12 +432,12 @@ const game_controller = () => {
     }
       
     //FUNCTION TO POPULATE 
-    async function populate_game_tiles (game_id){
+    this.populate_game_tiles = (game_id) => {
         return queries.load_tiles()
         .then(result => {
             result.forEach( (tile) => {
-                // let something = await queries.populate_game_tiles(game_id, tile); 
-            }, this);  ;
+                queries.populate_game_tiles(game_id, tile); 
+            }, this);
         })
     }
 

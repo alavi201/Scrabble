@@ -52,27 +52,27 @@ const game = app => {
       if( socket.room ){
         console.log('game socket emits already added for:' + user_id)
         return;
-      }
-      socket.room = game_id;
-      socket.join( socket.room );
-      request.session.game_socket = socket;
-      
-      socket.on( CHAT_MESSAGE, data => process_chat_message(data, user_id, socket, io) );
-      socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
-      socket.on( SWAP, data=> swap(data, game_id, user_id, socket));
+      } else {
+        socket.room = game_id;
+        socket.join( socket.room );
+        request.session.game_socket = socket;
+        
+        socket.on( CHAT_MESSAGE, data => process_chat_message(data, user_id, socket, io) );
+        socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
+        socket.on( SWAP, data=> swap(data, game_id, user_id, socket));
 
-      controller.get_player_rack([user_id, game_id])
-      .then( rack => socket.emit( CREATE_RACK, rack));
-      
-      socket.on( DISCONNECT, () => {
-        console.log( 'socket disconnected' );
-      }); 
-      
+        controller.get_player_rack([user_id, game_id])
+        .then( rack => socket.emit( CREATE_RACK, rack));
+        
+        socket.on( DISCONNECT, () => {
+          console.log( 'socket disconnected' );
+        }); 
+      }
     });
   };
 
   const validate_play = (data, game_id, user_id, socket) => {
-    if( data.lenght > 0 ){
+    if( data.length > 0 ){
       return controller.validate_game_play( user_id, game_id, data )
       .then( is_validated => {
         if( is_validated ){

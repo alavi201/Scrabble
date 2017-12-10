@@ -16,7 +16,7 @@ function swap_received(swapped_tiles){
 }
 
 function add_events( socket ){
-    $('#play').on('click', play_clicked(socket));
+    $('#play').on('click', function(){play_clicked(socket)});
     $('.rack.letter').on('click', rack_letter_clicked);
     $('.board_tile').on('click', board_tile_clicked);
     $('#swap').on('click', swap_clicked);
