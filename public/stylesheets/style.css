@@ -74,3 +74,12 @@ td.rack{
 .navbar{
   min-height: 10px !important;
 }
+
+.column-list-games {
+    float: left;
+    clear: both;
+}
+
+.select-players {
+    padding-bottom: 10px;
+}
