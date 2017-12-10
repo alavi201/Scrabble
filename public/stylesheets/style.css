@@ -44,9 +44,7 @@ a {
 table, th, td {
   border: 1px solid black;
   padding-bottom: 30px;
-}
-
-td {
+  text-align: center;
   min-width:35px
 }
 
@@ -78,8 +76,14 @@ td.rack{
 .column-list-games {
     float: left;
     clear: both;
+    padding-top: 25px;
+    width: 350px;
 }
 
 .select-players {
     padding-bottom: 10px;
+}
+
+.border-create-game {
+    width: 350px;
 }
