@@ -10,17 +10,14 @@ const lobby = app => {
 
 router.get('/', function(req, res, next) {
     
-    console.log('get----------------');
     session=req.session;
 
-    //if(session.admin){
-        //console.log("found user in session");
-        //console.log(session.user);
-    //}
-    //console.log(data.id);
-    sendGameDetails(req,res);
-    
-
+    if(session.user){
+        sendGameDetails(req,res);
+    }
+    else{
+        res.redirect('/login');
+    }
         
 });
 
@@ -29,13 +26,6 @@ router.post('/', function(req, res, next) {
     database.insert_new_game(req,res)
     .then((result) => sendGameDetails(req,res));
     //console.log(req.session.user);
-    
-   // .then((data) => 
-        
-    //    res.redirect('/lobby');
-   // });
-
-        
 });
 
 function sendGameDetails(req, res)
