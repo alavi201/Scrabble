@@ -27,4 +27,5 @@ coverage
 benchmarks/graphs
 
 .env
-public/
+package.json
+db/index.js

@@ -1,6 +1,7 @@
 const db = require('../../db');
 const queries = require('../../db/queries')(db);
 const { FLOW_TOP_TO_BOTTOM, FLOW_LEFT_TO_RIGHT, NO_FLOW } = require('../../constants/play_validation');
+const {LETTER_VALUES} = require('../../constants/letters');
 
 const game_controller = () => {
 
@@ -22,8 +23,9 @@ const game_controller = () => {
 
     //TODO implement this function
     //Store the message in database
-    this.process_message = message_data => {
+    this.process_message = (message_data, user_id) => {
         return new Promise(( resolve, reject ) => {
+            message_data = user_id + " : " + message_data;
             resolve( message_data );
         })
     };
@@ -38,10 +40,10 @@ const game_controller = () => {
         .then( this.find_starting_letter_accordingly )
         .then( this.extract_word )
         //uncomment the below .then once get_touching_tiles is implemented
-        //.then( validate_move )
+        .then( this.validate_move )
         //and comment the below two .then
-        .then( this.get_word_from_tiles )
-        .then( validate_word_api )
+        //.then( this.get_word_from_tiles )
+        //.then( validate_word_api )
 
     };
 
@@ -154,16 +156,20 @@ const game_controller = () => {
         }
     }
 
-    function BoardTile(){
+    function BoardTile( row, column ){
         this.letter = 0;
         this.premium = 0;
+        this.row = row;
+        this.column = column;
     }
 
-    function Tile(xCoordinate, yCoordinate, letter){
+    function Tile(xCoordinate, yCoordinate, letter, score, game_tile_id){
         this.row = xCoordinate;
         this.column = yCoordinate;
         this.value = letter;
         this.is_new = false;
+        this.game_tile_id = game_tile_id;
+        this.score = score
     }
 
     this.initialize_game_board = () =>{
@@ -173,7 +179,7 @@ const game_controller = () => {
 
         for(var i = 1 ; i < 16; i++) {
             for(var j = 1 ; j < 16; j++) {
-                board[i][j] = new BoardTile();
+                board[i][j] = new BoardTile(i, j);
             }
         }
         return board;
@@ -185,9 +191,11 @@ const game_controller = () => {
             let board = this.initialize_game_board();
             if( result.length >= 1 ){
                 result.forEach( (tile) => {
-                    boardTile = board[tile.xCoordinate][tile.yCoordinate];
-                    let game_tile = new Tile( tile.xCoordinate, tile.yCoordinate, String.fromCharCode(Math.floor(Math.random() * 26) + 65))
-                    boardTile.letter = game_tile;
+                    if(tile.xCoordinate != 0 && tile.yCoordinate !=0) {
+                        let boardTile = board[tile.xCoordinate][tile.yCoordinate];
+                        let game_tile = new Tile( tile.xCoordinate, tile.yCoordinate, LETTER_VALUES[tile.tileId].value,  LETTER_VALUES[tile.tileId].score, tile.id)
+                        boardTile.letter = game_tile;
+                    }
                 }, this);
                 return ( [letters, orientation, board ] );
             }
@@ -212,10 +220,7 @@ const game_controller = () => {
     this.mark_as_old_player = ( user_id, game_id ) => {
 
         return new Promise(( resolve, reject ) => {
-            this.get_game_board(game_id).then(result =>
-                resolve( true )
-            );
-            
+            resolve( true );
         });
         //return queries.mark_as_old_player( user_id, game_id )
     };
@@ -242,7 +247,7 @@ const game_controller = () => {
 
        //row is fixed, increment row till we hit a blank tile on the board or the end
         if( orientation === FLOW_TOP_TO_BOTTOM ){
-            while(board[row][column].letter != 0 && column < 16) {
+            while(board[row][column].letter != 0 && row < 16) {
                 board_tile = board[row][column];
                 tile = board_tile.letter;
                 word.push( tile );
@@ -270,7 +275,7 @@ const game_controller = () => {
         })
     }
 
-    this.get_word_from_tiles = ( [ orientation, board, word ] ) => {
+    function get_word_from_tiles( [ orientation, board, word ] ) {
        let word_string = "";
         
        word.forEach( (tile) => {
@@ -280,18 +285,30 @@ const game_controller = () => {
        return word_string;
     };
 
-    //TODO
     this.get_touching_tiles = ([ orientation, board, word ]) => {
-        //for every letter in word
-        // check if other tile is touching at top/left (based on orientation)
-        //      if touching, add that letter to an array.
-        // if not touching, then check bottom/right (based on orientation) for touching tile
-        //      if touching then add that letter to an array.
-        //return the array - touching_tiles.
+
+        let touching_tiles = [];
+
+        word.forEach( (tile) => {
+            if(tile.is_new == true ) {
+                if(orientation == FLOW_LEFT_TO_RIGHT){
+                    if((tile.row > 1 && board[tile.row -1][tile.column].letter !=0) || (tile.row < 15 && board[tile.row + 1][tile.column].letter !=0)){
+                        touching_tiles.push(tile);
+                    }
+                }
+
+                if(orientation == FLOW_TOP_TO_BOTTOM){
+                    if((tile.column > 1 && board[tile.row][tile.column - 1].letter !=0) || (tile.column < 15 && board[tile.row][tile.column + 1].letter !=0)){
+                        touching_tiles.push(tile);
+                    }
+                }
+            }  
+        }, this);
+        
         return touching_tiles;
     }
 
-    this.get_touching_words = ( touching_tiles ) =>{
+    this.get_touching_words = ( [orientation, board, touching_tiles] ) =>{
         touching_words = [];
         let opposite_orientation = (orientation === FLOW_LEFT_TO_RIGHT) ? FLOW_TOP_TO_BOTTOM : FLOW_LEFT_TO_RIGHT;
         for( let index = 0; index < touching_tiles.length; index++ ){
@@ -304,7 +321,8 @@ const game_controller = () => {
 
    async function validate_all_words( all_words ){
         for( let index = 0; index < all_words.length; index++ ){
-            let is_valid = await validate_word_api( all_words[index] );
+            let string_word = get_word_from_tiles([ 0, 0, all_words[index] ]);
+            let is_valid = await validate_word_api( string_word );
             if ( is_valid !== 1){
                 return false;
             }
@@ -313,12 +331,33 @@ const game_controller = () => {
     }
 
     this.validate_move = ( [orientation, board, word] ) => {
-        touching_tiles = this.get_touching_tiles([ orientation, board, word ]);
-        touching_words = this.get_touching_words( touching_tiles );
-        all_words = touching_words.push( word );
+        let touching_tiles = this.get_touching_tiles([ orientation, board, word ]);
 
-        return validate_all_words( all_words );
+        let touching_words = this.get_touching_words( [orientation, board, touching_tiles] );
+        touching_words.push( word );
 
+        return validate_all_words( touching_words );
+
+    }
+
+    this.get_player_rack = ([user_id, game_id] ) => {
+        return queries.select_player_rack(user_id, game_id)
+        .then( (result)  => {
+            if( result.length >= 1 ){
+                
+                let rack = []; 
+                
+                result.forEach( (letter) => {
+                    let rack_tile = new Tile( letter.xCoordinate, letter.yCoordinate, LETTER_VALUES[letter.tileId].value, LETTER_VALUES[letter.tileId].score, letter.id)
+                    rack.push(rack_tile);                   
+                }, this);  
+
+                return rack;
+            }
+            else{
+                return false;
+            }
+        })
     }
 
     return this;

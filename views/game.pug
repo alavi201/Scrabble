@@ -1,18 +1,27 @@
 extends layout
 
 block content
+  script(type="text/javascript", src="/socket.io/socket.io.js")
+  script(type="text/javascript", src="/javascripts/chat.js")
+  script(type="text/javascript", src="/javascripts/game.js")
   h1= title
   p Welcome to #{title}
 
   div.container-fluid.col-sm-12
     div.col-sm-9
       table(id='board')
-        tbody
-          each row in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        tbody 
+          each row in game_board
             tr
-              each column in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-                td.board_tile(data-row=row, data-column=column)= '.'
-
+            if row
+              each tile in row
+                if tile
+                  if tile.letter != 0
+                    td.board_tile(data-row=tile.row, data-column=tile.column)= tile.letter.value
+                  else if tile.premium != 0
+                    td.board_tile(data-row=tile.row, data-column=tile.column)= tile.premium
+                  else
+                    td.board_tile(data-row=tile.row, data-column=tile.column)= '.'
       br
       br
       h4 My Score: 34
@@ -22,8 +31,8 @@ block content
             th.rack.head(colspan='7') Rack
         tbody
           tr
-            each val in ['D', 'B', 'V', 'Z', 'Q', '', 'E']
-              td.rack.letter= val
+            each tile in rack
+              td.rack.letter=tile.value
       br
 
       div.col-sm-9
@@ -36,82 +45,5 @@ block content
         h3 Remaining Tiles: 
           p(id='tile_count') 56
 
-      div.chatwindow
-        ul#messages
-    
-      br
-      form()
-        input#m(type='text', placeholder='message' name='name')
-        button.btn(type='submit') Send
-
-  script(src='/socket.io/socket.io.js')
-  script.
-    const socket = io();
-
-    current_play = [];
-
-    $(function () {
-      socket.on('chat message', function(msg){
-        $('#messages').append($('<li>').text(msg));
-        window.scrollTo(0, document.body.scrollHeight);
-      });
-
-      socket.on('tile', function(word){
-        
-        $(word).each(function(i, letter){
-          //console.log(letter);
-          $('td[data-column='+letter.column+'][data-row='+letter.row+']').html(letter.value);
-        });
-        
-        $('#tile_count').html('54');
-        
-        //console.log('something');
-        //alert(obj.column);
-
-        //$('td[data-column='+obj.column+'][data-row='+obj.row+']').html(obj.value);
-        //window.scrollTo(0, document.body.scrollHeight);
-      });
-
-      $('form').submit(function(e){
-        e.preventDefault();
-        $('#messages').append($('<li>').text( $('#m').val()));
-        socket.emit('chat message', $('#m').val());
-        $('#m').val('');
-        return false;
-      });
-
-      $('.rack.letter').on('click',function(){
-        
-        $('.rack.letter').removeClass('active');
-        $(this).addClass('active');
-      });
-
-      $('.board_tile').on('click',function(){
-        
-        let active_letter = $('.rack.letter.active');
-
-
-        $(this).html($('.rack.letter.active').text());
-
-        let letter = new Object();
-        letter.row = $(this).data('row');
-        letter.column = $(this).data('column');
-        letter.value = active_letter.text();
-        active_letter.text('');
-        active_letter.addClass('empty');
-        current_play.push(letter);
-
-      });
-
-      $('#play').on('click',function(){
-        
-        socket.emit('tile',current_play);
-        console.log(current_play);
-        $('.empty').each(function(i, obj){
-          $(this).html(String.fromCharCode(Math.floor(Math.random() * 26) + 65));
-        });
-        current_play = [];
-        return false;
-      })
-
-    });
+      
+      include chat.pug

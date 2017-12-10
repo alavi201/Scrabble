@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller')();
-const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA } = require('../../constants/events');
+const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, RACK, CHAT_RECEIVED} = require('../../constants/events');
 
 const game = app => {
   
@@ -13,7 +13,7 @@ const game = app => {
 
       controller.validate_user_with_game( user_id, game_id )
       .then( (validated) => {
-        show_page( validated, response, next );
+        show_page( validated, response, next, game_id, user_id );
       }).catch( error => {
         console.log(error);
       });
@@ -36,9 +36,14 @@ const game = app => {
     
   });
 
-  const show_page = ( boolean_value, response, next) => {
+  const show_page = ( boolean_value, response, next, game_id, user_id ) => {
     if( boolean_value ){
-      response.render('game', { title: 'Game' });
+      Promise.all([
+        controller.get_game_board([0, 0], game_id),
+        controller.get_player_rack([user_id, game_id])
+      ])
+      .then( result => 
+        response.render('game', { title: 'Game', game_board: result[0][2], rack: result[1] }));
     }
     else{
       var err = new Error('Forbidden');
@@ -50,7 +55,8 @@ const game = app => {
   //Add socket events
   const add_socket_events = ( game_id, user_id ) => {
     
-    io = app.get('io');
+    root_io = app.get('io');
+    io = root_io.of('/game');
     io.on( CONNECTION, socket => 
     {
 
@@ -61,9 +67,11 @@ const game = app => {
         console.log(error);
       });;
       
-      socket.on( CHAT_MESSAGE, process_chat_message );
+      socket.on( CHAT_MESSAGE, data => process_chat_message(data, user_id, socket, io) );
   
       socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
+
+      socket.on( RACK, data=> get_player_rack(userId, game_id));
       
       socket.on( DISCONNECT, () => {
         console.log( 'socket disconnected' );
@@ -89,10 +97,10 @@ const game = app => {
 
   };
 
-  const process_chat_message = data => {
-    return controller.process_message( data )
+  const process_chat_message = (data, user_id, socket, io ) => {
+    return controller.process_message( data, user_id )
     .then( data => {
-      socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
+      io.in( socket.room ).emit(CHAT_RECEIVED, data);
     })
     // socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
     console.log('chat message: ' + data );
