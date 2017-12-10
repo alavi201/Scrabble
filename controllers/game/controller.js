@@ -360,19 +360,19 @@ const game_controller = () => {
         })
     }
 
-    this.get_unused_tiles = (game_id, tiles_to_swap) => {
-        return queries.get_unused_tiles(game_id, tiles_to_swap.length)
+    this.get_unused_tiles = (game_id, tile_count) => {
+        return queries.get_unused_tiles(game_id, tile_count)
         .then( (result)  => {
             if( result.length >= 1 ){
                 
-                let replaced_tiles = []; 
+                let unused_tiles = []; 
                 
                 result.forEach( (letter) => {
                     let tile = new Tile( letter.xCoordinate, letter.yCoordinate, LETTER_VALUES[letter.tileId].value, LETTER_VALUES[letter.tileId].score, letter.id)
-                    replaced_tiles.push(tile);                   
+                    unused_tiles.push(tile);                   
                 }, this);  
 
-                return replaced_tiles;
+                return unused_tiles;
             }
             else{
                 return false;
@@ -406,11 +406,11 @@ const game_controller = () => {
             return false;
     }
 
-    this.assign_tile_user = (user_id, swapped_tiles ) => {
-        let tile_id = this.get_tile_id(swapped_tiles);
+    this.assign_tile_user = (user_id, tiles ) => {
+        let tile_id = this.get_tile_id(tiles);
         return queries.assign_tile_user(user_id, tile_id)
         .then(result => {
-            return swapped_tiles;
+            return tiles;
         });
     }
 
@@ -418,7 +418,7 @@ const game_controller = () => {
         return queries.get_remaining_tile_count(game_id)
             .then(data => this.can_swap(data, tiles_to_swap))
             .then(result => this.clear_tile_association(result, tiles_to_swap))
-            .then(_ => this.get_unused_tiles(game_id, tiles_to_swap))
+            .then(_ => this.get_unused_tiles(game_id, tiles_to_swap.length))
             .then(swapped_tiles => this.assign_tile_user(user_id, swapped_tiles ));
             
     }
@@ -431,7 +431,7 @@ const game_controller = () => {
         })
     }
       
-    //FUNCTION TO POPULATE 
+    //FUNCTION TO POPULATE TILES ON INIT
     this.populate_game_tiles = (game_id) => {
         return queries.load_tiles()
         .then(result => {
@@ -439,6 +439,11 @@ const game_controller = () => {
                 queries.populate_game_tiles(game_id, tile); 
             }, this);
         })
+    }
+
+    this.create_player_rack = (game_id, user_id) => {
+        return this.get_unused_tiles(game_id, 7)
+            .then(unused_tiles => this.assign_tile_user(user_id, unused_tiles ));
     }
 
     return this;

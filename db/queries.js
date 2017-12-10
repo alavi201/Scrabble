@@ -84,6 +84,14 @@ const queries = database => {
     this.populate_game_tiles = (game_id, tile) => {
         return database.any('INSERT INTO game_tiles ("gameId", "tileId", "player_id", "xCoordinate", "yCoordinate") SELECT $1,$2,NULL,0,0 FROM generate_series(1,$3)', [game_id, tile.id, tile.count]);
     }    
+
+    this.get_game_users = (game_id) => {
+        return database.any('SELECT user_id FROM game_user WHERE "gameId" = $1 ', [game_id])
+        .then( data  => {
+            return data;
+        })
+    }
+
     return this;
 };
 module.exports = queries;
