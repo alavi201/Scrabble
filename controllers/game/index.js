@@ -46,24 +46,24 @@ const game = app => {
   }
   
   const add_socket_events = ( game_id, user_id, request ) => {
-    root_io = app.get('io');
-    io = root_io.of('/game');
+    let root_io = app.get('io');
+    let io = root_io.of('/game');
     io.on( CONNECTION, socket => {
       if( socket.room ){
         console.log('game socket emits already added for:' + user_id)
         return;
-      } else {
+      } 
+      else {
         socket.room = game_id;
+        socket.user_id = user_id;
         socket.join( socket.room );
         request.session.game_socket = socket;
         
+        page_loaded(game_id, root_io, io, socket);
+        
         socket.on( CHAT_MESSAGE, data => process_chat_message(data, user_id, socket, io) );
         socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
-        socket.on( SWAP, data=> swap(data, game_id, user_id, socket));
-
-        controller.get_player_rack([user_id, game_id])
-        .then( rack => socket.emit( CREATE_RACK, rack));
-        
+        socket.on( SWAP, data => swap(data, game_id, user_id, socket));        
         socket.on( DISCONNECT, () => {
           console.log( 'socket disconnected' );
         }); 
@@ -114,6 +114,92 @@ const game = app => {
     })
     // socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
     console.log('chat message: ' + data );
+  }
+
+  const check_game_full = ( game, root_io  ) => {
+    let ready_to_start;
+    let playerCount = root_io.nsps['/game'].adapter.rooms[game.id].length;
+    let max_number_players = parseInt(game.num_players);
+    if( playerCount == max_number_players ){
+      ready_to_start = true;
+    }
+    else{
+      ready_to_start = false;
+    }
+    return ready_to_start;
+  }
+
+  const initialize_game = ( io, game_id ) => {
+    let client_sockets = get_sockets_room( io, game_id );
+    return initialize_game_db( client_sockets, game_id )
+    .then( _ => {
+      client_sockets.forEach(function(client_socket) {
+        controller.get_player_rack([client_socket.user_id, game_id ])
+        .then( rack => {
+          console.log( client_socket.user_id );
+          client_socket.emit( CREATE_RACK, rack)}
+        );
+      }, this);
+    })
+
+  }
+
+  const initialize_game_db = ( client_sockets, game_id ) => {
+    return controller.populate_game_tiles( game_id )
+    .then( _ => {
+      client_sockets.forEach(function(client_socket) {
+        controller.create_player_rack( game_id, client_socket.user_id );
+      }, this);
+    })
+  }
+
+  const get_sockets_room = ( io, room ) => {
+    let sock_keys = io.adapter.rooms[room].sockets;
+    let keys = Object.keys( sock_keys )
+    let client_sockets =[];
+    keys.forEach(function(key) {
+      client_sockets.push(io.connected[key]);
+    }, this);
+    return client_sockets;
+  }
+
+  const check_game_started = ( game ) => {
+    let status = parseInt(game.status);
+    if( status == 0 ){
+      return [false, game];
+    }
+    else{
+      return [true, game];
+    }
+
+  }
+
+  const emit_rack = ( socket, game_id ) => {
+    controller.get_player_rack([socket.user_id, game_id ])
+    .then( rack => {
+      socket.emit( CREATE_RACK, rack)}
+    );
+  }
+
+  const check_for_initialization = ( game, root_io, io) => {
+    let ready_to_start = check_game_full( game, root_io );
+    if( ready_to_start ){
+      initialize_game(io, game.id);
+      controller.change_game_status( game.id );
+    }
+  }
+
+  const page_loaded = (game_id, root_io, io, socket) => {
+    controller.get_game( game_id )
+    .then( check_game_started )
+    .then( result => {
+      if( result[0] ){
+        emit_rack(socket, game_id);
+      }
+      else{
+        check_for_initialization( result[1], root_io, io);
+      }
+    })
   }
 
   return router;

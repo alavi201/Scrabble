@@ -92,6 +92,19 @@ const queries = database => {
         })
     }
 
+    this.get_game = ( game_id) => {
+        return database.any('SELECT * FROM games WHERE "id" = $1 ', [game_id])
+        .then( data  => {
+            return data;
+        })
+    }
+
+    this.change_game_status = ( game_id ) =>{
+        return database.none('Update games set status = 1 WHERE id = $1',[game_id])
+         .then( ()  => {
+         })
+     };
+
     return this;
 };
 module.exports = queries;

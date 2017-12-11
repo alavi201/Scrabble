@@ -461,7 +461,7 @@ const game_controller = () => {
         return queries.load_tiles()
         .then(result => {
             result.forEach( (tile) => {
-                queries.populate_game_tiles(game_id, tile); 
+                return queries.populate_game_tiles(game_id, tile); 
             }, this);
         })
     }
@@ -471,6 +471,17 @@ const game_controller = () => {
             .then(unused_tiles => this.assign_tile_user(user_id, unused_tiles ));
     }
 
+
+    this.get_game = (game_id) => {
+        return queries.get_game(game_id)
+        .then(result => {
+            return result[0];
+        })
+    }
+
+    this.change_game_status = (game_id) => {
+        return queries.change_game_status( game_id );
+    }
     return this;
 }
 module.exports = game_controller;
