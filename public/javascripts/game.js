@@ -5,22 +5,26 @@ let socket;
 function attach_sockect_events( socket ){
     socket.on('tile', tile_broadcast_received);
     socket.on('swap', swap_received);
+    socket.on('create rack', create_rack);
+    socket.on('display players', display_players);
+    socket.on('turn', turn);
 }
 
 function swap_received(swapped_tiles){
     $('.swapped').each(function(i, letter){
       $(this).html(swapped_tiles[i].value);
-    });
-    
-  }
+      $(this).html(swapped_tiles[i]).addClass( swapped_tiles[i].value.toLowerCase() )
+    }); 
+}
 
 function add_events( socket ){
-    $('#play').on('click', play_clicked(socket));
+    $('#play').on('click', function(){play_clicked(socket)});
     $('.rack.letter').on('click', rack_letter_clicked);
     $('.board_tile').on('click', board_tile_clicked);
     $('#swap').on('click', swap_clicked);
     $(document).on('click', '.rack.swappable',rack_swappable_clicked);
     $('.confirmation').on('click', confirmation_clicked);
+    $('#pass').on('click', function(){pass_clicked(socket)});    
 }
 
 function swap_clicked(){
@@ -37,6 +41,15 @@ function play_clicked( socket ){
     return false;
 }
 
+function pass_clicked( socket ){        
+    socket.emit('pass',Array());
+    console.log('pass move');
+    $('#play').attr('disabled', true);
+    $('#swap').attr('disabled', true);
+    $('#pass').attr('disabled', true);
+    return false;
+}
+
 function rack_letter_clicked(){
     $('.rack.letter').removeClass('active');
     $(this).addClass('active');
@@ -44,13 +57,20 @@ function rack_letter_clicked(){
     
 function board_tile_clicked(){  
     let active_letter = $('.rack.letter.active');
-    $(this).html($('.rack.letter.active').text());
+    $(this).addClass("placed_tile");
+    $(this).addClass(active_letter.val().toLowerCase());
+    $(this).val(active_letter.val());
+    $(this).off('click', board_tile_clicked);
     let letter = new Object();
     letter.row = $(this).data('row');
     letter.column = $(this).data('column');
-    letter.value = active_letter.text();
-    active_letter.text('');
-    active_letter.addClass('empty');
+    letter.score = $(active_letter).data('score');
+    letter.game_tile_id = $(active_letter).data('row_id');
+    console.log("ROW: "+letter.row+" col: "+letter.column);
+    letter.value = active_letter.val();
+    active_letter.removeClass(active_letter.val().toLowerCase());
+    // active_letter.val("");
+    // active_letter.addClass('empty');
     current_play.push(letter);
 }
    
@@ -85,4 +105,62 @@ function confirmation_clicked(){
     console.log(tiles_to_swap);
     tiles_to_swap = [];
     return false;
+}
+
+function create_rack( rack ){
+    let table = document.getElementById("rack-holder");
+    let tbody = document.createElement('tbody');
+    let tr = document.createElement("tr");
+    console.log(rack);
+    var count = 7;
+    rack.forEach( (tile) => {   
+        if(count-- >0){
+        let td = document.createElement("td");
+        td.className += 'rack ';
+        td.className += 'letter ';
+        if( tile.value == " " ){
+            td.className += 'blank';
+        } 
+        else{
+           td.className += tile.value.toLowerCase();
+        }
+        td.value = tile.value;
+        td.addEventListener('click', rack_letter_clicked);
+        td.setAttribute('data-row_id', tile.game_tile_id);
+        td.setAttribute('data-score', tile.score);   
+        tr.appendChild(td);
+    }
+    }, this)
+    tbody.appendChild(tr);
+    table.appendChild(tbody);
+}
+
+function display_players( players ){
+    let table = document.getElementById("players");
+    let tbody = document.createElement('tbody');
+    console.log(players);
+    players.forEach( (player) => {
+        let tr = document.createElement("tr");
+        
+        let name_td = document.createElement("td");
+        name_td.className += 'player';
+        name_td.innerHTML = player.user_id;
+        name_td.setAttribute('data-user_id', player.user_id);
+        tr.appendChild(name_td);
+
+        let score_td = document.createElement("td");
+        score_td.className += 'score';
+        score_td.innerHTML = '0';
+        score_td.setAttribute('data-user_id', player.user_id);
+        tr.appendChild(score_td);
+        
+        tbody.appendChild(tr);
+    }, this)
+    table.appendChild(tbody);
+}
+
+function turn(){
+    $('#play').removeAttr('disabled');
+    $('#swap').removeAttr('disabled');
+    $('#pass').removeAttr('disabled');
 }

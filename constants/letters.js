@@ -1,12 +1,14 @@
-let n = 27;
-let letter_array = new Array();
-for (var i = 1; i < n; i++){
+const db = require('../db');
+const queries = require('../db/queries')(db);
+let LETTER_VALUES = new Array();
 
-    let letter = {value: String.fromCharCode(i - 1 + 65), score: Math.floor(Math.random() * 10)};
+queries.load_tiles()
+.then(result => {
+    letter_array =  result;
+    
+    letter_array.forEach( (letter) => {
+        LETTER_VALUES[letter.id] = {value: letter.letter, score: letter.score}; 
+    }, this);  
+});
 
-    letter_array[i] = letter;
-}
-
-const LETTER_VALUES = letter_array;
-
-module.exports = { LETTER_VALUES};
+module.exports = {LETTER_VALUES};

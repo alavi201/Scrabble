@@ -14,7 +14,7 @@ var tests = require('./routes/tests');
 
 var app = express();
 
-var game = require('./controllers/game')(app);
+var game = require('./controllers/game/index')(app);
 var login = require('./controllers/login')(app);
 var lobby = require('./controllers/lobby')(app);
 var logout = require('./controllers/logout')(app);
