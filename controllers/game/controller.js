@@ -36,6 +36,7 @@ const game_controller = () => {
         .then( this.find_starting_letter_accordingly )
         .then( this.extract_word )
         .then( this.validate_move )
+        .then( this.calculate_move_score)
         
 
     };
@@ -269,7 +270,7 @@ const game_controller = () => {
             let converted_tiles = [];        
             play_data.forEach( (tile) => {
                     
-                let new_tile = new Tile( tile.row, tile.column, tile.value);
+                let new_tile = new Tile( tile.row, tile.column, tile.value, tile.score, tile.game_tile_id);
                     new_tile.is_new = true;
                     converted_tiles.push(new_tile);
                 }, this);
@@ -329,7 +330,31 @@ const game_controller = () => {
                 return false;
             }
         }
-        return true;
+        return all_words;
+    }
+
+    this.calculate_move_score = (all_words) => {
+        if(all_words) {
+            let move_score = 0;
+
+            all_words.forEach ( (word) => {
+                move_score += this.calculate_word_score(word);
+            }, this);
+
+            return move_score;
+        } else {
+            return false;
+        }
+    }
+
+    this.calculate_word_score = (word) => {
+        let score = 0;
+        
+        word.forEach( (tile) => {
+            score += tile.score; 
+        }, this);  
+        
+        return score;
     }
 
     this.validate_move = ( [orientation, board, word] ) => {
