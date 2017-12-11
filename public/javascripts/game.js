@@ -7,6 +7,7 @@ function attach_sockect_events( socket ){
     socket.on('swap', swap_received);
     socket.on('create rack', create_rack);
     socket.on('display players', display_players);
+    socket.on('turn', turn);
 }
 
 function swap_received(swapped_tiles){
@@ -23,6 +24,7 @@ function add_events( socket ){
     $('#swap').on('click', swap_clicked);
     $(document).on('click', '.rack.swappable',rack_swappable_clicked);
     $('.confirmation').on('click', confirmation_clicked);
+    $('#pass').on('click', function(){pass_clicked(socket)});    
 }
 
 function swap_clicked(){
@@ -36,6 +38,15 @@ function play_clicked( socket ){
         $(this).html(String.fromCharCode(Math.floor(Math.random() * 26) + 65));
     });
     current_play = [];
+    return false;
+}
+
+function pass_clicked( socket ){        
+    socket.emit('pass',Array());
+    console.log('pass move');
+    $('#play').attr('disabled', true);
+    $('#swap').attr('disabled', true);
+    $('#pass').attr('disabled', true);
     return false;
 }
 
@@ -146,4 +157,10 @@ function display_players( players ){
         tbody.appendChild(tr);
     }, this)
     table.appendChild(tbody);
+}
+
+function turn(){
+    $('#play').removeAttr('disabled');
+    $('#swap').removeAttr('disabled');
+    $('#pass').removeAttr('disabled');
 }
