@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller')();
-const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK } = require('../../constants/events');
+const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS } = require('../../constants/events');
 
 
 const game = app => {
@@ -59,10 +59,14 @@ const game = app => {
         
         socket.on( CHAT_MESSAGE, data => process_chat_message(data, user_id, socket, io) );
         socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
-        socket.on( SWAP, data=> swap(data, game_id, user_id, socket));
+        socket.on( SWAP, data => swap(data, game_id, user_id, socket));
+        socket.on( PASS, data => pass(data, socket));
 
         controller.get_player_rack([user_id, game_id])
         .then( rack => socket.emit( CREATE_RACK, rack));
+
+        controller.get_game_users(game_id)
+        .then( users => socket.emit( DISPLAY_PLAYERS, users));
         
         socket.on( DISCONNECT, () => {
           console.log( 'socket disconnected' );
@@ -114,6 +118,11 @@ const game = app => {
     })
     // socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
     console.log('chat message: ' + data );
+  }
+
+  const pass = (socket, data) => {
+    socket.broadcast.in( socket.room ).emit( PASS);
+    console.log('pass');
   }
 
   return router;
