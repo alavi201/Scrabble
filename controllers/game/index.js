@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller')();
-const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS } = require('../../constants/events');
+const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS, GAME_STARTED } = require('../../constants/events');
 
 
 const game = app => {
   
+
+  let io = app.io.of('/game');
+
   router.get('/:gameId', function(request, response, next) {
     try{
       if( typeof request.session.user === 'undefined'  ){
@@ -13,13 +16,13 @@ const game = app => {
         return;
       }
 
-      const game_id = request.params.gameId;
-      const user_id = request.session.player_id;
+      game_id = request.params.gameId;
+      user_id = request.session.player_id;
 
       controller.validate_user_with_game( user_id, game_id )
       .then( (validated) => {
         if( validated ){
-          add_socket_events( game_id, user_id, request );
+          console.log("Before add_sockets, User ID: "+user_id + " and game Id: "+ game_id);
           show_page( validated, response, next, game_id, user_id, request );
         }
       });
@@ -45,38 +48,6 @@ const game = app => {
     }
   }
   
-  const add_socket_events = ( game_id, user_id, request ) => {
-    let root_io = app.get('io');
-    let io = root_io.of('/game');
-    io.on( CONNECTION, socket => {
-      if( socket.room ){
-        console.log('game socket emits already added for:' + user_id)
-        return;
-      } 
-      else {
-        socket.room = game_id;
-        socket.user_id = user_id;
-        socket.join( socket.room );
-        request.session.game_socket = socket;
-        
-        page_loaded(game_id, root_io, io, socket);
-        
-        socket.on( CHAT_MESSAGE, data => process_chat_message(data, user_id, socket, io) );
-        socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
-        socket.on( SWAP, data => swap(data, game_id, user_id, socket));        
-        socket.on( PASS, data => pass(data, socket));
-
-        //Move this to game start event
-        controller.get_game_users(game_id)
-        .then( users => socket.emit( DISPLAY_PLAYERS, users));
-        
-        socket.on( DISCONNECT, () => {
-          console.log( 'socket disconnected' );
-        }); 
-      }
-    });
-  };
-
   const validate_play = (data, game_id, user_id, socket) => {
     if( data.length > 0 ){
       return controller.validate_game_play( user_id, game_id, data )
@@ -113,18 +84,17 @@ const game = app => {
 
   }; 
 
-  const process_chat_message = (data, user_id, socket, io) => {
+  const process_chat_message = (data) => {
     return controller.process_message( data, user_id)
     .then( data => {
-      io.in( socket.room ).emit(CHAT_RECEIVED, data);
+      io.in( game_id ).emit(CHAT_RECEIVED, data);
     })
-    // socket.broadcast.in( socket.room ).emit(CHAT_MESSAGE, data);
     console.log('chat message: ' + data );
   }
 
-  const check_game_full = ( game, root_io  ) => {
+  const check_game_full = ( game, app  ) => {
     let ready_to_start;
-    let playerCount = root_io.nsps['/game'].adapter.rooms[game.id].length;
+    let playerCount = app.io.nsps['/game'].adapter.rooms[game_id].length;
     let max_number_players = parseInt(game.num_players);
     if( playerCount == max_number_players ){
       ready_to_start = true;
@@ -133,30 +103,6 @@ const game = app => {
       ready_to_start = false;
     }
     return ready_to_start;
-  }
-
-  const initialize_game = ( io, game_id ) => {
-    let client_sockets = get_sockets_room( io, game_id );
-    return initialize_game_db( client_sockets, game_id )
-    .then( _ => {
-      client_sockets.forEach(function(client_socket) {
-        controller.get_player_rack([client_socket.user_id, game_id ])
-        .then( rack => {
-          console.log( client_socket.user_id );
-          client_socket.emit( CREATE_RACK, rack)}
-        );
-      }, this);
-    })
-
-  }
-
-  const initialize_game_db = ( client_sockets, game_id ) => {
-    return controller.populate_game_tiles( game_id )
-    .then( _ => {
-      client_sockets.forEach(function(client_socket) {
-        controller.create_player_rack( game_id, client_socket.user_id );
-      }, this);
-    })
   }
 
   const get_sockets_room = ( io, room ) => {
@@ -172,46 +118,83 @@ const game = app => {
   const check_game_started = ( game ) => {
     let status = parseInt(game.status);
     if( status == 0 ){
-      return [false, game];
+      return false;
     }
     else{
-      return [true, game];
+      return true;
     }
 
   }
 
-  const emit_rack = ( socket, game_id ) => {
-    controller.get_player_rack([socket.user_id, game_id ])
+  const emit_rack = ( socket, game_id, user_id ) => {
+    controller.get_player_rack([ user_id, game_id ])
     .then( rack => {
-      socket.emit( CREATE_RACK, rack)}
-    );
+      socket.emit( CREATE_RACK, rack)
+      return true;
+    });
   }
 
-  const check_for_initialization = ( game, root_io, io) => {
-    let ready_to_start = check_game_full( game, root_io );
+  const emit_start_game = ( ready_to_start ) => {
     if( ready_to_start ){
-      initialize_game(io, game.id);
-      controller.change_game_status( game.id );
+      io.in( game_id ).emit(GAME_STARTED, "game started");
     }
   }
 
-  const page_loaded = (game_id, root_io, io, socket) => {
-    controller.get_game( game_id )
-    .then( check_game_started )
+  const run_socket_connected = (game_id, socket, user_id) => {
+    let current_game;
+    return controller.get_game( game_id )
+    .then( game => {
+      current_game = game;
+      return check_game_started( game );
+    })
     .then( result => {
-      if( result[0] ){
-        emit_rack(socket, game_id);
+      if( result ){
+        return ontroller.create_rack_required( game_id, user_id ) 
       }
       else{
-        check_for_initialization( result[1], root_io, io);
+        return controller.creator_created_game( game_id, user_id )
       }
     })
+    .then( _ => emit_rack(socket, game_id, user_id))
+    .then( _ => check_game_full( current_game ))
+    .then( emit_start_game );
   }
 
   const pass = (socket, data) => {
     socket.broadcast.in( socket.room ).emit( PASS);
-    console.log('pass');
+    console.log('In pass event for user: '+ socket.user_id);
   }
+
+  io.on( CONNECTION, socket => {
+    console.log('In game sockets for user:' + user_id + " game id: "+ game_id);
+    if( socket.room ){
+      console.log('game socket emits already added for:' + user_id + " game id: "+ game_id);
+    } 
+    else {
+      socket.room = game_id;
+      socket.user_id = user_id;
+      socket.join( socket.room );
+
+      console.log("-----------------Socket Connected------------------");
+      console.log("User ID: "+user_id + " and game ID: " + game_id);
+      console.log("Number of players in Room:"+game_id+" are: "+app.io.nsps['/game'].adapter.rooms[game_id].length);
+
+      run_socket_connected( game_id, socket, user_id);
+
+      socket.on( CHAT_MESSAGE, process_chat_message);
+      socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
+      socket.on( SWAP, data => swap(data, game_id, user_id, socket));        
+      socket.on( PASS, data => pass(data, socket));
+
+      //Move this to game start event
+      controller.get_game_users(game_id)
+      .then( users => socket.emit( DISPLAY_PLAYERS, users));
+      
+      socket.on( DISCONNECT, () => {
+        console.log( 'socket disconnected for user:' + socket.user_id );
+      }); 
+    }
+  });
 
   return router;
 }

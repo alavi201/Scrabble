@@ -59,7 +59,8 @@ const login = app => {
         req.session.user = req.body.username;
         req.session.player_id = data.id;
         req.session.save();
-
+        console.log( "User logged in: "+req.session.player_id);
+        console.log( "User logged in: "+req.session.user);
         res.redirect('/lobby');
     });
     }

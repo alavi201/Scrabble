@@ -457,15 +457,19 @@ const game_controller = () => {
             return result;
         })
     }
+
+    this.initialize_game_db = ( game_id ) => {
+        return queries.load_tiles()
+        .then( tiles => populate_game_tiles(game_id, tiles) );
+    }
       
     //FUNCTION TO POPULATE TILES ON INIT
-    this.populate_game_tiles = (game_id) => {
-        return queries.load_tiles()
-        .then(result => {
-            result.forEach( (tile) => {
-                return queries.populate_game_tiles(game_id, tile); 
-            }, this);
-        })
+    async function populate_game_tiles (game_id, tiles){
+        for( let index = 0; index < tiles.length; index++ ){
+            let tile = tiles[ index ];
+            let inserted = await queries.populate_game_tiles(game_id, tile);
+        }
+        return true;
     }
 
     this.create_player_rack = (game_id, user_id) => {
@@ -501,6 +505,37 @@ const game_controller = () => {
             return false;
         }
     }
+
+    this.game_tiles_created = (game_id) => {
+        return queries.game_tiles_exist( game_id )
+        .then( result => {
+            if ( result.length > 0 ){
+                return true;
+            }
+            else{
+                return false;
+            }
+        })
+    }
+
+    this.creator_created_game = (game_id, user_id) => {
+        return this.initialize_game_db( game_id )
+        .then( _ => this.create_player_rack( game_id, user_id ))
+    }
+
+    this.create_rack_required = ( game_id, user_id ) => {
+        return queries.select_player_rack(user_id, game_id)
+        .then( rack => {
+            if( rack.length > 0 ){
+                return true;
+            }
+            else{
+                return this.create_player_rack(game_id, user_id)
+                .then( _ =>  true);
+            }
+        })
+    }
+    
 
     return this;
 }
