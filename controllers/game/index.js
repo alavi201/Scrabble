@@ -122,7 +122,6 @@ const game = app => {
     console.log('chat message: ' + data );
   }
 
-<<<<<<< HEAD
   const check_game_full = ( game, root_io  ) => {
     let ready_to_start;
     let playerCount = root_io.nsps['/game'].adapter.rooms[game.id].length;
@@ -207,11 +206,11 @@ const game = app => {
         check_for_initialization( result[1], root_io, io);
       }
     })
-=======
+  }
+
   const pass = (socket, data) => {
     socket.broadcast.in( socket.room ).emit( PASS);
     console.log('pass');
->>>>>>> fd1e16ebd5cf05008a677d2e07c0e73806a6ec9d
   }
 
   return router;
