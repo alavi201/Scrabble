@@ -36,6 +36,7 @@ const game_controller = () => {
         .then( this.find_starting_letter_accordingly )
         .then( this.extract_word )
         .then( this.validate_move )
+        .then( this.calculate_move_score)
         
 
     };
@@ -269,7 +270,7 @@ const game_controller = () => {
             let converted_tiles = [];        
             play_data.forEach( (tile) => {
                     
-                let new_tile = new Tile( tile.row, tile.column, tile.value);
+                let new_tile = new Tile( tile.row, tile.column, tile.value, tile.score, tile.game_tile_id);
                     new_tile.is_new = true;
                     converted_tiles.push(new_tile);
                 }, this);
@@ -329,7 +330,31 @@ const game_controller = () => {
                 return false;
             }
         }
-        return true;
+        return all_words;
+    }
+
+    this.calculate_move_score = (all_words) => {
+        if(all_words) {
+            let move_score = 0;
+
+            all_words.forEach ( (word) => {
+                move_score += this.calculate_word_score(word);
+            }, this);
+
+            return move_score;
+        } else {
+            return false;
+        }
+    }
+
+    this.calculate_word_score = (word) => {
+        let score = 0;
+        
+        word.forEach( (tile) => {
+            score += tile.score; 
+        }, this);  
+        
+        return score;
     }
 
     this.validate_move = ( [orientation, board, word] ) => {
@@ -360,19 +385,19 @@ const game_controller = () => {
         })
     }
 
-    this.get_unused_tiles = (game_id, tiles_to_swap) => {
-        return queries.get_unused_tiles(game_id, tiles_to_swap.length)
+    this.get_unused_tiles = (game_id, tile_count) => {
+        return queries.get_unused_tiles(game_id, tile_count)
         .then( (result)  => {
             if( result.length >= 1 ){
                 
-                let replaced_tiles = []; 
+                let unused_tiles = []; 
                 
                 result.forEach( (letter) => {
                     let tile = new Tile( letter.xCoordinate, letter.yCoordinate, LETTER_VALUES[letter.tileId].value, LETTER_VALUES[letter.tileId].score, letter.id)
-                    replaced_tiles.push(tile);                   
+                    unused_tiles.push(tile);                   
                 }, this);  
 
-                return replaced_tiles;
+                return unused_tiles;
             }
             else{
                 return false;
@@ -406,11 +431,11 @@ const game_controller = () => {
             return false;
     }
 
-    this.assign_tile_user = (user_id, swapped_tiles ) => {
-        let tile_id = this.get_tile_id(swapped_tiles);
+    this.assign_tile_user = (user_id, tiles ) => {
+        let tile_id = this.get_tile_id(tiles);
         return queries.assign_tile_user(user_id, tile_id)
         .then(result => {
-            return swapped_tiles;
+            return tiles;
         });
     }
 
@@ -418,9 +443,32 @@ const game_controller = () => {
         return queries.get_remaining_tile_count(game_id)
             .then(data => this.can_swap(data, tiles_to_swap))
             .then(result => this.clear_tile_association(result, tiles_to_swap))
-            .then(_ => this.get_unused_tiles(game_id, tiles_to_swap))
+            .then(_ => this.get_unused_tiles(game_id, tiles_to_swap.length))
             .then(swapped_tiles => this.assign_tile_user(user_id, swapped_tiles ));
             
+    }
+
+    //FUNCTION TO GET TILES TABLE
+    this.load_tiles = () => {
+        return queries.load_tiles()
+        .then(result => {
+            return result;
+        })
+    }
+      
+    //FUNCTION TO POPULATE TILES ON INIT
+    this.populate_game_tiles = (game_id) => {
+        return queries.load_tiles()
+        .then(result => {
+            result.forEach( (tile) => {
+                queries.populate_game_tiles(game_id, tile); 
+            }, this);
+        })
+    }
+
+    this.create_player_rack = (game_id, user_id) => {
+        return this.get_unused_tiles(game_id, 7)
+            .then(unused_tiles => this.assign_tile_user(user_id, unused_tiles ));
     }
 
     return this;

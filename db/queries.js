@@ -35,7 +35,7 @@ const queries = database => {
     };
 
     this.select_player_rack = (user_id, game_id) =>{
-        return database.any('SELECT * FROM game_tiles WHERE "playerId" = $1 and "gameId" = $2 and "xCoordinate" = 0 and "yCoordinate" = 0',[user_id,game_id])
+        return database.any('SELECT * FROM game_tiles WHERE "player_id" = $1 and "gameId" = $2 and "xCoordinate" = 0 and "yCoordinate" = 0',[user_id,game_id])
          .then( data  => {
              return data;
          })
@@ -49,14 +49,14 @@ const queries = database => {
     };
     
     this.get_unused_tiles = (game_id, tile_count) => {
-        return database.any('SELECT * FROM game_tiles WHERE "game_id" = $1 AND "player_id" is null  ORDER BY random() LIMIT $2', [game_id, tile_count])
+        return database.any('SELECT * FROM game_tiles WHERE "gameId" = $1 AND "player_id" is null  ORDER BY random() LIMIT $2', [game_id, tile_count])
         .then( data  => {
             return data;
         })
     }
 
     this.get_remaining_tile_count = (game_id) => {
-        return database.any('SELECT count(*) as total FROM game_tiles WHERE "game_id" = $1 AND "player_id" is null', [game_id])
+        return database.any('SELECT count(*) as total FROM game_tiles WHERE "gameId" = $1 AND "player_id" is null', [game_id])
         .then( data  => {
             return data;
         })
@@ -73,6 +73,24 @@ const queries = database => {
         .then( ()  => {
         })
     }    
+
+    this.load_tiles = () => {
+        return database.any('SELECT * FROM tiles ORDER BY id asc')
+        .then((data) =>{
+            return data;
+        })
+    }
+
+    this.populate_game_tiles = (game_id, tile) => {
+        return database.any('INSERT INTO game_tiles ("gameId", "tileId", "player_id", "xCoordinate", "yCoordinate") SELECT $1,$2,NULL,0,0 FROM generate_series(1,$3)', [game_id, tile.id, tile.count]);
+    }    
+
+    this.get_game_users = (game_id) => {
+        return database.any('SELECT user_id FROM game_user WHERE "gameId" = $1 ', [game_id])
+        .then( data  => {
+            return data;
+        })
+    }
 
     return this;
 };

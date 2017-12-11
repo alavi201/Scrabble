@@ -16,7 +16,7 @@ function swap_received(swapped_tiles){
 }
 
 function add_events( socket ){
-    $('#play').on('click', play_clicked(socket));
+    $('#play').on('click', function(){play_clicked(socket)});
     $('.rack.letter').on('click', rack_letter_clicked);
     $('.board_tile').on('click', board_tile_clicked);
     $('#swap').on('click', swap_clicked);
@@ -52,6 +52,8 @@ function board_tile_clicked(){
     let letter = new Object();
     letter.row = $(this).data('row');
     letter.column = $(this).data('column');
+    letter.score = $(active_letter).data('score');
+    letter.game_tile_id = $(active_letter).data('row_id');
     console.log("ROW: "+letter.row+" col: "+letter.column);
     letter.value = active_letter.val();
     active_letter.removeClass(active_letter.val().toLowerCase());
@@ -112,7 +114,8 @@ function create_rack( rack ){
         }
         td.value = tile.value;
         td.addEventListener('click', rack_letter_clicked);
-        td.setAttribute('data-row_id', tile.game_tile_id);   
+        td.setAttribute('data-row_id', tile.game_tile_id);
+        td.setAttribute('data-score', tile.score);   
         tr.appendChild(td);
     }
     }, this)
