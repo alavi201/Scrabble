@@ -30,7 +30,7 @@ router.post('/', function(req, res, next) {
     .then((result) => {
         //console.log(result.id);
         database.insert_game_user(result.id,req,res)
-        sendGameDetails(req,res)
+        res.redirect( '/game/'+ result.id);
     });
 });
 
