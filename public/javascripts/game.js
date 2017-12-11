@@ -6,6 +6,8 @@ function attach_sockect_events( socket ){
     socket.on('tile', tile_broadcast_received);
     socket.on('swap', swap_received);
     socket.on('create rack', create_rack);
+    socket.on('display players', display_players);
+    socket.on('turn', turn);
 }
 
 function swap_received(swapped_tiles){
@@ -22,6 +24,7 @@ function add_events( socket ){
     $('#swap').on('click', swap_clicked);
     $(document).on('click', '.rack.swappable',rack_swappable_clicked);
     $('.confirmation').on('click', confirmation_clicked);
+    $('#pass').on('click', function(){pass_clicked(socket)});    
 }
 
 function swap_clicked(){
@@ -35,6 +38,15 @@ function play_clicked( socket ){
         $(this).html(String.fromCharCode(Math.floor(Math.random() * 26) + 65));
     });
     current_play = [];
+    return false;
+}
+
+function pass_clicked( socket ){        
+    socket.emit('pass',Array());
+    console.log('pass move');
+    $('#play').attr('disabled', true);
+    $('#swap').attr('disabled', true);
+    $('#pass').attr('disabled', true);
     return false;
 }
 
@@ -121,4 +133,34 @@ function create_rack( rack ){
     }, this)
     tbody.appendChild(tr);
     table.appendChild(tbody);
+}
+
+function display_players( players ){
+    let table = document.getElementById("players");
+    let tbody = document.createElement('tbody');
+    console.log(players);
+    players.forEach( (player) => {
+        let tr = document.createElement("tr");
+        
+        let name_td = document.createElement("td");
+        name_td.className += 'player';
+        name_td.innerHTML = player.user_id;
+        name_td.setAttribute('data-user_id', player.user_id);
+        tr.appendChild(name_td);
+
+        let score_td = document.createElement("td");
+        score_td.className += 'score';
+        score_td.innerHTML = '0';
+        score_td.setAttribute('data-user_id', player.user_id);
+        tr.appendChild(score_td);
+        
+        tbody.appendChild(tr);
+    }, this)
+    table.appendChild(tbody);
+}
+
+function turn(){
+    $('#play').removeAttr('disabled');
+    $('#swap').removeAttr('disabled');
+    $('#pass').removeAttr('disabled');
 }

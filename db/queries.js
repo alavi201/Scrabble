@@ -83,10 +83,14 @@ const queries = database => {
 
     this.populate_game_tiles = (game_id, tile) => {
         return database.any('INSERT INTO game_tiles ("gameId", "tileId", "player_id", "xCoordinate", "yCoordinate") SELECT $1,$2,NULL,0,0 FROM generate_series(1,$3)', [game_id, tile.id, tile.count]);
-    }    
+    } 
+    
+    this.place_game_tiles = (tile) => {
+        return database.any('UPDATE game_tiles SET "xCoordinate" =$1, "yCoordinate"= $2 WHERE id = $3', [tile.row, tile.column, tile.game_tile_id]);
+    } 
 
     this.get_game_users = (game_id) => {
-        return database.any('SELECT user_id FROM game_user WHERE "gameId" = $1 ', [game_id])
+        return database.any('SELECT user_id FROM game_user WHERE "game_id" = $1 ', [game_id])
         .then( data  => {
             return data;
         })

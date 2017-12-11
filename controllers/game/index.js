@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller')();
-const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK } = require('../../constants/events');
+const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS } = require('../../constants/events');
 
 
 const game = app => {
@@ -64,6 +64,12 @@ const game = app => {
         socket.on( CHAT_MESSAGE, data => process_chat_message(data, user_id, socket, io) );
         socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
         socket.on( SWAP, data => swap(data, game_id, user_id, socket));        
+        socket.on( PASS, data => pass(data, socket));
+
+        //Move this to game start event
+        controller.get_game_users(game_id)
+        .then( users => socket.emit( DISPLAY_PLAYERS, users));
+        
         socket.on( DISCONNECT, () => {
           console.log( 'socket disconnected' );
         }); 
@@ -116,6 +122,7 @@ const game = app => {
     console.log('chat message: ' + data );
   }
 
+<<<<<<< HEAD
   const check_game_full = ( game, root_io  ) => {
     let ready_to_start;
     let playerCount = root_io.nsps['/game'].adapter.rooms[game.id].length;
@@ -200,6 +207,11 @@ const game = app => {
         check_for_initialization( result[1], root_io, io);
       }
     })
+=======
+  const pass = (socket, data) => {
+    socket.broadcast.in( socket.room ).emit( PASS);
+    console.log('pass');
+>>>>>>> fd1e16ebd5cf05008a677d2e07c0e73806a6ec9d
   }
 
   return router;

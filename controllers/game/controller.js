@@ -36,6 +36,7 @@ const game_controller = () => {
         .then( this.find_starting_letter_accordingly )
         .then( this.extract_word )
         .then( this.validate_move )
+        .then( result => this.update_game_tiles( result, play_data))
         .then( this.calculate_move_score)
         
 
@@ -341,6 +342,7 @@ const game_controller = () => {
                 move_score += this.calculate_word_score(word);
             }, this);
 
+            console.log(move_score);
             return move_score;
         } else {
             return false;
@@ -482,6 +484,24 @@ const game_controller = () => {
     this.change_game_status = (game_id) => {
         return queries.change_game_status( game_id );
     }
+    this.get_game_users = (game_id) => {
+        return queries.get_game_users(game_id)
+        .then(result => {
+            return result;
+        })
+    }
+
+    this.update_game_tiles = (all_words, new_tiles) => {
+        if(all_words){
+            new_tiles.forEach( (tile) => {
+                queries.place_game_tiles(tile); 
+            }, this);
+        }
+        else{
+            return false;
+        }
+    }
+
     return this;
 }
 module.exports = game_controller;
