@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const queries = require('../db/queries')(db);
 const dbjs = require('../db/tempQueries')
 const database = new dbjs(db)
 var session;
@@ -26,6 +27,8 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
 
     console.log('in post lobby');
+
+
     database.insert_new_game(req,res)
     .then((result) => {
         //console.log(result.id);

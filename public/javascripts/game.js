@@ -94,18 +94,23 @@ $(document).ready(function() {
 function rack_swappable_clicked(){
     $(this).addClass('swapped');
     $(this).css('background-color','#f7f6a8');
-
+    debugger;
     let letter = new Object();
     letter.game_tile_id = $(this).data('row_id');
+    letter.value = $(this).data('letter');
     tiles_to_swap.push(letter);
 }
 
 function confirmation_clicked(){
     socket.emit('swap',tiles_to_swap);
     console.log(tiles_to_swap);
+    $(tiles_to_swap).each(function(i, letter){
+        $('td[data-row_id='+letter.game_tile_id+']').removeClass(letter.value.toLowerCase());  
+    });
     tiles_to_swap = [];
     return false;
 }
+
 
 function create_rack( rack ){
     let table = document.getElementById("rack-holder");
@@ -128,6 +133,7 @@ function create_rack( rack ){
         td.addEventListener('click', rack_letter_clicked);
         td.setAttribute('data-row_id', tile.game_tile_id);
         td.setAttribute('data-score', tile.score);   
+        td.setAttribute('data-letter', tile.value);
         tr.appendChild(td);
     }
     }, this)
