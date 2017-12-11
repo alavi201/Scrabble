@@ -6,6 +6,7 @@ function attach_sockect_events( socket ){
     socket.on('tile', tile_broadcast_received);
     socket.on('swap', swap_received);
     socket.on('create rack', create_rack);
+    socket.on('display players', display_players);
 }
 
 function swap_received(swapped_tiles){
@@ -120,5 +121,29 @@ function create_rack( rack ){
     }
     }, this)
     tbody.appendChild(tr);
+    table.appendChild(tbody);
+}
+
+function display_players( players ){
+    let table = document.getElementById("players");
+    let tbody = document.createElement('tbody');
+    console.log(players);
+    players.forEach( (player) => {
+        let tr = document.createElement("tr");
+        
+        let name_td = document.createElement("td");
+        name_td.className += 'player';
+        name_td.innerHTML = player.user_id;
+        name_td.setAttribute('data-user_id', player.user_id);
+        tr.appendChild(name_td);
+
+        let score_td = document.createElement("td");
+        score_td.className += 'score';
+        score_td.innerHTML = '0';
+        score_td.setAttribute('data-user_id', player.user_id);
+        tr.appendChild(score_td);
+        
+        tbody.appendChild(tr);
+    }, this)
     table.appendChild(tbody);
 }

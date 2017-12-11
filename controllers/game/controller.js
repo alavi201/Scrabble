@@ -471,6 +471,13 @@ const game_controller = () => {
             .then(unused_tiles => this.assign_tile_user(user_id, unused_tiles ));
     }
 
+    this.get_game_users = (game_id) => {
+        return queries.get_game_users(game_id)
+        .then(result => {
+            return result;
+        })
+    }
+
     return this;
 }
 module.exports = game_controller;

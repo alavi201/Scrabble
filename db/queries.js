@@ -86,7 +86,7 @@ const queries = database => {
     }    
 
     this.get_game_users = (game_id) => {
-        return database.any('SELECT user_id FROM game_user WHERE "gameId" = $1 ', [game_id])
+        return database.any('SELECT user_id FROM game_user WHERE "game_id" = $1 ', [game_id])
         .then( data  => {
             return data;
         })
