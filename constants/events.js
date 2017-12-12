@@ -9,8 +9,9 @@ const SWAP = 'swap';
 const CREATE_RACK = 'create rack';
 const DISPLAY_PLAYERS = 'display players';
 const PASS = 'pass';
-
-module.exports = { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS };
+const GAME_STARTED = 'game started'
+const JOINED = 'join game';
+module.exports = { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS, GAME_STARTED,JOINED };
 
 
 

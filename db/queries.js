@@ -107,7 +107,12 @@ const queries = database => {
         return database.none('Update games set status = 1 WHERE id = $1',[game_id])
          .then( ()  => {
          })
-     };
+    };
+
+
+    this.game_tiles_exist = ( game_id ) =>{
+        return database.any('SELECT * FROM game_tiles WHERE "id" = $1 ', [game_id]);
+    }
 
     return this;
 };

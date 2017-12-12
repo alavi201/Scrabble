@@ -7,7 +7,7 @@ const logout = app => {
 
     router.get('/', function (req, res) {
        req.session.destroy();
-        res.render('login',{title:'Login Page'});
+        res.redirect('login');
     });
 
     return router;
