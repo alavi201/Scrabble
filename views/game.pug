@@ -17,7 +17,7 @@ block content
               each tile in row
                 if tile
                   if tile.letter != 0
-                    td.board_tile.placed_tile(data-row=tile.row, data-column=tile.column,class=tile.letter.value.toLowerCase())= tile.letter.value
+                    td.board_tile.placed_tile(data-row=tile.row, data-column=tile.column,class=tile.letter.value.toLowerCase())
                   else if tile.premium != 0
                     td.board_tile(data-row=tile.row, data-column=tile.column)= tile.premium
                   else

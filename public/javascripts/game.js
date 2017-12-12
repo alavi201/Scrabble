@@ -62,7 +62,7 @@ function rack_letter_clicked(){
     
 function board_tile_clicked(){  
     let active_letter = $('.rack.letter.active');
-    debugger;
+    //debugger;
     $(this).addClass("placed_tile");
     $(this).addClass(active_letter.val().toLowerCase());
     $(this).val(active_letter.val());
@@ -183,7 +183,7 @@ function display_board(board_data){
 	let table = document.getElementById("board");
 	table.innerHTML = '';
     let tbody = document.createElement('tbody');
-    debugger;
+    //debugger;
 
     let row = '';
     let tile = '';
