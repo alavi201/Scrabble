@@ -38,6 +38,7 @@ const game_controller = () => {
         .then( this.validate_move )
         .then( result => this.update_game_tiles( result, play_data))
         .then( result => this.calculate_move_score(game_id, user_id, result))
+        .then( result => this.update_player_rack(result, game_id, user_id, play_data.length))
         .catch( err => {
             console.log( "error in validate_game_play");
             console.log( err );
@@ -476,6 +477,18 @@ const game_controller = () => {
             let inserted = await queries.populate_game_tiles(game_id, tile);
         }
         return true;
+    }
+
+    this.update_player_rack = (is_valid, game_id, user_id, new_tile_count) => {
+        if(is_valid){
+            return this.get_unused_tiles(game_id, new_tile_count)
+            .then(unused_tiles => {
+               return this.assign_tile_user(user_id, unused_tiles )}
+            );
+        }
+        else{
+            return false;
+        }
     }
 
     this.create_player_rack = (game_id, user_id) => {

@@ -60,9 +60,12 @@ const game = app => {
           controller.get_game_board( [0, 0], game_id)
           .then(board => io.in(game_id).emit( 'display board', board ));
           display_player_score(game_id);
+          emit_rack( socket, game_id, user_id );
         }
         else{
-          socket.in( game_id ).emit( INVALID_MOVE, data );
+          controller.get_game_board( [0, 0], game_id)
+          .then(board => io.in(game_id).emit( 'display board', board ));
+          emit_rack( socket, game_id, user_id );
         }
       })
     }

@@ -125,6 +125,7 @@ function confirmation_clicked(){
 
 function create_rack( rack ){
     let table = document.getElementById("rack-holder");
+    table.innerHTML= '';
     let tbody = document.createElement('tbody');
     let tr = document.createElement("tr");
     console.log(rack);
