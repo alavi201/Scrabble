@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller')();
+<<<<<<< HEAD
 const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS, GAME_STARTED, JOINED, CHANGE_TURN } = require('../../constants/events');
+=======
+const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS, GAME_STARTED, JOINED, REMAINING_TILES } = require('../../constants/events');
+>>>>>>> e38fbff958386ffeef6bdb8acd3010c1a06dba5a
 
 
 const game = app => {
@@ -60,16 +64,17 @@ const game = app => {
       .then( is_validated => {
         console.log("in validate play then"+is_validated);
         if( is_validated ){
-          console.log("after validated--------------");
-          socket.broadcast.in( game_id ).emit( TILE, data );
-          return controller.get_current_turn (user_id, game_id)
-          .then( current_user_row =>{
-            io.in(game_id).emit(CHANGE_TURN,current_user_row);
-            return true;
-          });
+          controller.get_game_board( [0, 0], game_id)
+          .then(board => io.in(game_id).emit( 'display board', board ));
+          display_player_score(game_id);
+          emit_rack( socket, game_id, user_id );
+          controller.get_remaining_tiles( game_id )
+          .then( remaining_tiles_count => io.in(game_id).emit( REMAINING_TILES,remaining_tiles_count[0].count ));
         }
         else{
-          socket.in( game_id ).emit( INVALID_MOVE, data );
+          controller.get_game_board( [0, 0], game_id)
+          .then(board => io.in(game_id).emit( 'display board', board ));
+          emit_rack( socket, game_id, user_id );
         }
       })
     }
@@ -84,10 +89,10 @@ const game = app => {
       return controller.swap_user_tiles( user_id, game_id, data )
       .then (swapped_tiles => {
           if(swapped_tiles) {
-            socket.emit( SWAP, swapped_tiles );
+            emit_rack( socket, game_id, user_id )
           }
           else {
-            socket.in( socket.room ).emit( INVALID_MOVE, data );
+            socket.emit( INVALID_MOVE, "Swap Could Not be Completed" );
           }
       })
     }
@@ -149,14 +154,14 @@ const game = app => {
 
   const emit_start_game = ( ready_to_start ) => {
     if( ready_to_start ){
-      io.in( game_id ).emit(GAME_STARTED, "game started");
+      io.in( game_id ).emit(GAME_STARTED, "");
     }
     return true;
   }
 
-  const display_player_score = (game_id, socket) => {
-    controller.get_game_users(game_id)
-    .then( users => socket.emit( DISPLAY_PLAYERS, users));
+  const display_player_score = (game_id) => {
+    controller.get_game_scores(game_id)
+    .then( users => io.in(game_id).emit( DISPLAY_PLAYERS, users));
   }
   
 
@@ -178,7 +183,11 @@ const game = app => {
     .then( _ => emit_rack(socket, game_id, user_id))
     .then( _ => check_game_full( current_game, app ))
     .then( emit_start_game )
-    .then( _ => display_player_score(game_id, socket))
+    .then( _ => display_player_score(game_id))
+    .then( _ => {
+      controller.get_remaining_tiles( game_id )
+      .then( remaining_tiles_count => io.in(game_id).emit( REMAINING_TILES,remaining_tiles_count[0].count ));
+    })
   }
 
   const pass = (socket, data) => {
@@ -209,9 +218,9 @@ const game = app => {
     }
 
     const socket_swap = (client_data) => {
-      let game_id = data.game_id;
-      let user_id = data.user_id;
-      let data = data.play; 
+      let game_id = client_data.game_id;
+      let user_id = client_data.user_id;
+      let data = client_data.play; 
       return swap(data, game_id, user_id, socket);
     }
 

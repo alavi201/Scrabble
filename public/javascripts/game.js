@@ -9,22 +9,55 @@ function attach_sockect_events( socket ){
     socket.on('display players', display_players);
     socket.on('display board', display_board);
     socket.on('change turn', turn);
+    socket.on('turn', turn);
+    socket.on( 'remaining tiles', show_remaining_tiles );
+    socket.on( 'game started', game_started );
+}
+
+function game_started( data ){
+    let tile_count = document.getElementById("tile-count");
+    tile_count.style.visibility = "visible";
+
+    let rack_container = document.getElementById("rack_container");
+    let game_controls = document.getElementById("game_controls");
+    let feedback_lbl = document.getElementById("feedback_message");
+    if( data == "" ){
+        rack_container.style.visibility = "visible";
+        game_controls.style.visibility = "visible";
+        feedback_lbl.innerHTML = "";
+    }
+    else{
+        rack_container.style.visibility = "hidden";
+        game_controls.style.visibility = "hidden";
+        feedback_lbl.innerHTML = data;
+    }
+}
+
+function show_remaining_tiles( remaining_tiles ){
+    let tile_count = document.getElementById('tile_count');
+    tile_count.innerText = remaining_tiles;
 }
 
 function swap_received(swapped_tiles){
     $('.swapped').each(function(i, letter){
       $(this).html(swapped_tiles[i].value);
-      $(this).html(swapped_tiles[i]).addClass( swapped_tiles[i].value.toLowerCase() )
-    }); 
+      $(this).html(swapped_tiles[i]).addClass( swapped_tiles[i].value.toLowerCase() );
+      $(this).html(swapped_tiles[i]).removeClass( $(this).data('letter').toLowerCase());
+      $(this).attr('data-letter',swapped_tiles[i].value.toUpperCase());
+      $(this).html(swapped_tiles[i]).removeClass('active');
+    });
+    $('.swappble').each(function(i, letter){
+        $(this).removeClass('swappble');
+    });
 }
 
 function add_events( socket ){
     $('#play').on('click', function(){play_clicked(socket)});
-    $('.rack.letter').on('click', rack_letter_clicked);
-    $('.board_tile').on('click', board_tile_clicked);
-    $('#swap').on('click', swap_clicked);
+    $(document).on('click', '.rack.letter', rack_letter_clicked);
+    $(document).on('click', '.board_tile', board_tile_clicked);
+    $(document).on('click', '#swap', swap_clicked);
     $(document).on('click', '.rack.swappable',rack_swappable_clicked);
-    $('.confirmation').on('click', confirmation_clicked);
+    $(document).on('click', '.confirmation', confirmation_clicked);
     $('#pass').on('click', function(){pass_clicked(socket)});    
 }
 
@@ -100,7 +133,6 @@ $(document).ready(function() {
 function rack_swappable_clicked(){
     $(this).addClass('swapped');
     $(this).css('background-color','#f7f6a8');
-    debugger;
     let letter = new Object();
     letter.game_tile_id = $(this).data('row_id');
     letter.value = $(this).data('letter');
@@ -124,6 +156,7 @@ function confirmation_clicked(){
 
 function create_rack( rack ){
     let table = document.getElementById("rack-holder");
+    table.innerHTML= '';
     let tbody = document.createElement('tbody');
     let tr = document.createElement("tr");
     console.log(rack);
@@ -153,6 +186,7 @@ function create_rack( rack ){
 
 function display_players( players ){
     let table = document.getElementById("players");
+    table.innerHTML = '';
     let tbody = document.createElement('tbody');
     console.log(players);
     players.forEach( (player) => {
@@ -166,7 +200,7 @@ function display_players( players ){
 
         let score_td = document.createElement("td");
         score_td.className += 'score';
-        score_td.innerHTML = '0';
+        score_td.innerHTML = player.score;
         score_td.setAttribute('data-user_id', player.user_id);
         tr.appendChild(score_td);
         
@@ -181,7 +215,6 @@ function display_board(board_data){
 	let table = document.getElementById("board");
 	table.innerHTML = '';
     let tbody = document.createElement('tbody');
-    //debugger;
 
     let row = '';
     let tile = '';

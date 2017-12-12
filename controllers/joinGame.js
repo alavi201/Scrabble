@@ -20,8 +20,19 @@ const joinGame = app => {
             response.redirect('/game/'+game_id); 
           }
           else{
-            database.insert_game_user(game_id, request, response)
-            .then( response.redirect('/game/'+game_id)  );
+            controller.get_game(game_id)
+            .then( (game) => {
+              controller.get_game_users(game_id)
+              .then( (game_users) => {
+                if(game_users.length < parseInt(game.num_players)){
+                  database.insert_game_user(game_id, request, response)
+                  .then( response.redirect('/game/'+game_id)  );
+                }
+                else{
+                  response.redirect('/lobby'); 
+                }
+              })
+            })           
           }
         });
 
