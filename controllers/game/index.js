@@ -57,7 +57,8 @@ const game = app => {
       return controller.validate_game_play( user_id, game_id, data )
       .then( is_validated => {
         if( is_validated ){
-          socket.broadcast.in( game_id ).emit( TILE, data );
+          controller.get_game_board( [0, 0], game_id)
+          .then(board => io.in(game_id).emit( 'display board', board ));
           display_player_score(game_id);
         }
         else{
