@@ -40,8 +40,14 @@ function show_remaining_tiles( remaining_tiles ){
 function swap_received(swapped_tiles){
     $('.swapped').each(function(i, letter){
       $(this).html(swapped_tiles[i].value);
-      $(this).html(swapped_tiles[i]).addClass( swapped_tiles[i].value.toLowerCase() )
-    }); 
+      $(this).html(swapped_tiles[i]).addClass( swapped_tiles[i].value.toLowerCase() );
+      $(this).html(swapped_tiles[i]).removeClass( $(this).data('letter').toLowerCase());
+      $(this).attr('data-letter',swapped_tiles[i].value.toUpperCase());
+      $(this).html(swapped_tiles[i]).removeClass('active');
+    });
+    $('.swappble').each(function(i, letter){
+        $(this).removeClass('swappble');
+    });
 }
 
 function add_events( socket ){
@@ -88,7 +94,6 @@ function rack_letter_clicked(){
     
 function board_tile_clicked(){  
     let active_letter = $('.rack.letter.active');
-    //debugger;
     $(this).addClass("placed_tile");
     $(this).addClass(active_letter.val().toLowerCase());
     $(this).val(active_letter.val());
@@ -127,7 +132,6 @@ $(document).ready(function() {
 function rack_swappable_clicked(){
     $(this).addClass('swapped');
     $(this).css('background-color','#f7f6a8');
-    debugger;
     let letter = new Object();
     letter.game_tile_id = $(this).data('row_id');
     letter.value = $(this).data('letter');
@@ -209,7 +213,6 @@ function display_board(board_data){
 	let table = document.getElementById("board");
 	table.innerHTML = '';
     let tbody = document.createElement('tbody');
-    //debugger;
 
     let row = '';
     let tile = '';

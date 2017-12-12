@@ -82,10 +82,10 @@ const game = app => {
       return controller.swap_user_tiles( user_id, game_id, data )
       .then (swapped_tiles => {
           if(swapped_tiles) {
-            socket.emit( SWAP, swapped_tiles );
+            emit_rack( socket, game_id, user_id )
           }
           else {
-            socket.in( socket.room ).emit( INVALID_MOVE, data );
+            socket.emit( INVALID_MOVE, "Swap Could Not be Completed" );
           }
       })
     }

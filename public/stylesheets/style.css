@@ -114,17 +114,6 @@ table td.board_tile.placed_tile{
   display:table-cell;
 }
 
-.c {
-  background: url("https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg") -430px -40px no-repeat;
-  display: inline-block;
-  width: 155px;
-  height: 155px;
-  border-radius: 20px;
-  border: 2px solid black;
-  zoom: 38%;
-  margin: 19px;
-}
-
 .rack-tile{
   zoom:25%;
 }
@@ -146,10 +135,25 @@ table#rack-holder td.rack.letter{
   zoom:30%;
 }
 
+table#rack-holder td.rack.swappable.active.swapped{
+  border-style: solid;
+  border-color: black;
+  border-width: medium;
+}
+
 table.table.table-striped.ongoing-games tr *{
   text-align:center;
 }
 
+table#rack-holder td.rack.letter.active{
+    border-style: solid;
+    border-color: black;
+    border-width: medium;
+}
+
+table#rack-holder td.rack.swappable{
+  display: inline-block;
+}
 
 .a {
   background: url(https://static.vecteezy.com/system/resources/previews/000/089/873/original/scrabble-tile-vector-set.jpg)
