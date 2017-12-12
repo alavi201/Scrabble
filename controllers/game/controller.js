@@ -365,6 +365,10 @@ const game_controller = () => {
     }
 
     this.validate_move = ( [orientation, board, word] ) => {
+
+        if(board[8][8].letter == 0)
+            return false;
+
         let touching_tiles = this.get_touching_tiles([ orientation, board, word ]);
 
         let touching_words = this.get_touching_words( [orientation, board, touching_tiles] );
