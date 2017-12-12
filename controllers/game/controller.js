@@ -37,7 +37,8 @@ const game_controller = () => {
         .then( this.extract_word )
         .then( this.validate_move )
         .then( result => this.update_game_tiles( result, play_data))
-        .then( this.calculate_move_score)
+        .then( result => this.calculate_move_score(game_id, user_id, result))
+        .then( result => this.update_player_rack(result, game_id, user_id, play_data.length))
         .catch( err => {
             console.log( "error in validate_game_play");
             console.log( err );
@@ -338,7 +339,7 @@ const game_controller = () => {
         return all_words;
     }
 
-    this.calculate_move_score = (all_words) => {
+    this.calculate_move_score = (game_id, user_id, all_words) => {
         if(all_words) {
             let move_score = 0;
 
@@ -347,7 +348,7 @@ const game_controller = () => {
             }, this);
 
             console.log(move_score);
-            return move_score;
+            return this.update_player_score(game_id, user_id, move_score);
         } else {
             return false;
         }
@@ -478,6 +479,18 @@ const game_controller = () => {
         return true;
     }
 
+    this.update_player_rack = (is_valid, game_id, user_id, new_tile_count) => {
+        if(is_valid){
+            return this.get_unused_tiles(game_id, new_tile_count)
+            .then(unused_tiles => {
+               return this.assign_tile_user(user_id, unused_tiles )}
+            );
+        }
+        else{
+            return false;
+        }
+    }
+
     this.create_player_rack = (game_id, user_id) => {
         return this.get_unused_tiles(game_id, 7)
             .then(unused_tiles => {
@@ -508,6 +521,8 @@ const game_controller = () => {
             new_tiles.forEach( (tile) => {
                 queries.place_game_tiles(tile); 
             }, this);
+
+            return all_words;
         }
         else{
             return false;
@@ -543,6 +558,22 @@ const game_controller = () => {
                 return this.create_player_rack(game_id, user_id)
                 .then( _ =>  true);
             }
+        })
+    }
+
+    this.update_player_score = (game_id, user_id, move_score) => {
+        if(move_score){
+            return queries.update_player_score(game_id, user_id, move_score)
+            .then( _ => true);
+        }else {
+            return false;
+        }
+    }
+
+    this.get_game_user = (game_id, user_id) => {
+        return queries.get_game_user(game_id, user_id)
+        .then(result => {
+            return result;
         })
     }
     

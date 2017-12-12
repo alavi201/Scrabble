@@ -90,7 +90,14 @@ const queries = database => {
     } 
 
     this.get_game_users = (game_id) => {
-        return database.any('SELECT user_id FROM game_user WHERE "game_id" = $1 ', [game_id])
+        return database.any('SELECT * FROM game_user WHERE "game_id" = $1 ', [game_id])
+        .then( data  => {
+            return data;
+        })
+    }
+
+    this.get_game_user = (game_id, user_id) => {
+        return database.any('SELECT * FROM game_user WHERE "game_id" = $1 AND "user_id" = $2', [game_id, user_id])
         .then( data  => {
             return data;
         })
@@ -113,6 +120,12 @@ const queries = database => {
     this.game_tiles_exist = ( game_id ) =>{
         return database.any('SELECT * FROM game_tiles WHERE "id" = $1 ', [game_id]);
     }
+
+    this.update_player_score = ( game_id, user_id, score ) =>{
+        return database.none('UPDATE game_user SET "score" = score + $1 WHERE "game_id" = $2 and "user_id" = $3',[score, game_id, user_id])
+         .then( ()  => {
+         })
+    };
 
     return this;
 };

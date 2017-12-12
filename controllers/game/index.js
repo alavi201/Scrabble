@@ -57,10 +57,15 @@ const game = app => {
       return controller.validate_game_play( user_id, game_id, data )
       .then( is_validated => {
         if( is_validated ){
-          socket.broadcast.in( game_id ).emit( TILE, data );
+          controller.get_game_board( [0, 0], game_id)
+          .then(board => io.in(game_id).emit( 'display board', board ));
+          display_player_score(game_id);
+          emit_rack( socket, game_id, user_id );
         }
         else{
-          socket.in( game_id ).emit( INVALID_MOVE, data );
+          controller.get_game_board( [0, 0], game_id)
+          .then(board => io.in(game_id).emit( 'display board', board ));
+          emit_rack( socket, game_id, user_id );
         }
       })
     }
@@ -145,9 +150,9 @@ const game = app => {
     return true;
   }
 
-  const display_player_score = (game_id, socket) => {
+  const display_player_score = (game_id) => {
     controller.get_game_users(game_id)
-    .then( users => socket.emit( DISPLAY_PLAYERS, users));
+    .then( users => io.in(game_id).emit( DISPLAY_PLAYERS, users));
   }
   
 
@@ -169,7 +174,7 @@ const game = app => {
     .then( _ => emit_rack(socket, game_id, user_id))
     .then( _ => check_game_full( current_game, app ))
     .then( emit_start_game )
-    .then( _ => display_player_score(game_id, socket))
+    .then( _ => display_player_score(game_id))
   }
 
   const pass = (socket, data) => {
@@ -196,9 +201,9 @@ const game = app => {
     }
 
     const socket_swap = (client_data) => {
-      let game_id = data.game_id;
-      let user_id = data.user_id;
-      let data = data.play; 
+      let game_id = client_data.game_id;
+      let user_id = client_data.user_id;
+      let data = client_data.play; 
       return swap(data, game_id, user_id, socket);
     }
 

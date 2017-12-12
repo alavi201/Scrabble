@@ -20,11 +20,11 @@ function swap_received(swapped_tiles){
 
 function add_events( socket ){
     $('#play').on('click', function(){play_clicked(socket)});
-    $('.rack.letter').on('click', rack_letter_clicked);
-    $('.board_tile').on('click', board_tile_clicked);
-    $('#swap').on('click', swap_clicked);
+    $(document).on('click', '.rack.letter', rack_letter_clicked);
+    $(document).on('click', '.board_tile', board_tile_clicked);
+    $(document).on('click', '#swap', swap_clicked);
     $(document).on('click', '.rack.swappable',rack_swappable_clicked);
-    $('.confirmation').on('click', confirmation_clicked);
+    $(document).on('click', '.confirmation', confirmation_clicked);
     $('#pass').on('click', function(){pass_clicked(socket)});    
 }
 
@@ -62,6 +62,7 @@ function rack_letter_clicked(){
     
 function board_tile_clicked(){  
     let active_letter = $('.rack.letter.active');
+    debugger;
     $(this).addClass("placed_tile");
     $(this).addClass(active_letter.val().toLowerCase());
     $(this).val(active_letter.val());
@@ -124,6 +125,7 @@ function confirmation_clicked(){
 
 function create_rack( rack ){
     let table = document.getElementById("rack-holder");
+    table.innerHTML= '';
     let tbody = document.createElement('tbody');
     let tr = document.createElement("tr");
     console.log(rack);
@@ -153,6 +155,7 @@ function create_rack( rack ){
 
 function display_players( players ){
     let table = document.getElementById("players");
+    table.innerHTML = '';
     let tbody = document.createElement('tbody');
     console.log(players);
     players.forEach( (player) => {
@@ -166,7 +169,7 @@ function display_players( players ){
 
         let score_td = document.createElement("td");
         score_td.className += 'score';
-        score_td.innerHTML = '0';
+        score_td.innerHTML = player.score;
         score_td.setAttribute('data-user_id', player.user_id);
         tr.appendChild(score_td);
         
@@ -180,7 +183,7 @@ function display_board(board_data){
 	let table = document.getElementById("board");
 	table.innerHTML = '';
     let tbody = document.createElement('tbody');
-    //debugger;
+    debugger;
 
     let row = '';
     let tile = '';
