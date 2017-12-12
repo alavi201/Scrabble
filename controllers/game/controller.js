@@ -546,7 +546,7 @@ const game_controller = () => {
         .then( _ => {
             return this.create_player_rack( game_id, user_id )
         })
-        .then( _ =>change_game_status ( game_id) );
+        .then( _ => this.change_game_status ( game_id) );
     }
 
     this.create_rack_required = ( game_id, user_id ) => {
