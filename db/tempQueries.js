@@ -25,12 +25,21 @@ let database = function (db)  {
 
   this.insert_new_game = (req,res) =>{
     const date=new Date();
-    return db.none(`INSERT INTO games ("creator_id","num_players","status","created_at") VALUES (22,$1,1,$2);`,[req.body.playervalue,date]);//, [req.body.name,req.body.email,req.body.username,req.body.password,date])
-
+    return db.one(`INSERT INTO games ("creator_id","num_players","status","created_at") 
+    VALUES ($1,$2,0,$3) returning id`,[req.session.player_id,req.body.playervalue,date])
+    .then((result) => {
+      return result
+    })
   }
 
   this.get_games = (req,res) =>{
-    return db.any("select * from games");
+    return db.any("select users.username as creator, games.* from users , games where games.creator_id = users.id");
+  }
+
+  this.insert_game_user = (gameId,req,res) =>{
+    const date=new Date();
+    return db.any(`INSERT INTO game_user ("user_id","game_id","score","is_spectator","updated_at") 
+    VALUES ($1,$2,0,0,$3)`,[req.session.player_id,gameId,date])
   }
 
   return this;

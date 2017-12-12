@@ -21,9 +21,9 @@ const game_controller = () => {
         return queries.select_new_game_user( user_id, game_id )
     };
 
-    this.process_message = (message_data, user_id) => {
+    this.process_message = (message_data, user_name) => {
         return new Promise(( resolve, reject ) => {
-            message_data = user_id + " : " + message_data;
+            message_data = user_name + " : " + message_data;
             resolve( message_data );
         })
     };
@@ -36,6 +36,13 @@ const game_controller = () => {
         .then( this.find_starting_letter_accordingly )
         .then( this.extract_word )
         .then( this.validate_move )
+        .then( result => this.update_game_tiles( result, play_data))
+        .then( result => this.calculate_move_score(game_id, user_id, result))
+        .then( result => this.update_player_rack(result, game_id, user_id, play_data.length))
+        .catch( err => {
+            console.log( "error in validate_game_play");
+            console.log( err );
+        })
         
 
     };
@@ -111,7 +118,6 @@ const game_controller = () => {
     }
 
     this.sort_accordingly = ( data, orientation ) => {
-
         sorted_letters = data.sort( (a, b) => {
             if (orientation === FLOW_LEFT_TO_RIGHT){
                 return a.column - b.column;
@@ -199,6 +205,9 @@ const game_controller = () => {
                 }, this);
                 return ( [letters, orientation, board ] );
             }
+            else{
+                return ( [letters, orientation, board ] );
+            }
         })
     }
 
@@ -267,7 +276,7 @@ const game_controller = () => {
             let converted_tiles = [];        
             play_data.forEach( (tile) => {
                     
-                let new_tile = new Tile( tile.row, tile.column, tile.value);
+                let new_tile = new Tile( tile.row, tile.column, tile.value, tile.score, tile.game_tile_id);
                     new_tile.is_new = true;
                     converted_tiles.push(new_tile);
                 }, this);
@@ -327,10 +336,39 @@ const game_controller = () => {
                 return false;
             }
         }
-        return true;
+        return all_words;
+    }
+
+    this.calculate_move_score = (game_id, user_id, all_words) => {
+        if(all_words) {
+            let move_score = 0;
+
+            all_words.forEach ( (word) => {
+                move_score += this.calculate_word_score(word);
+            }, this);
+
+            console.log(move_score);
+            return this.update_player_score(game_id, user_id, move_score);
+        } else {
+            return false;
+        }
+    }
+
+    this.calculate_word_score = (word) => {
+        let score = 0;
+        
+        word.forEach( (tile) => {
+            score += tile.score; 
+        }, this);  
+        
+        return score;
     }
 
     this.validate_move = ( [orientation, board, word] ) => {
+
+        if(board[8][8].letter == 0)
+            return false;
+
         let touching_tiles = this.get_touching_tiles([ orientation, board, word ]);
 
         let touching_words = this.get_touching_words( [orientation, board, touching_tiles] );
@@ -344,14 +382,12 @@ const game_controller = () => {
         return queries.select_player_rack(user_id, game_id)
         .then( (result)  => {
             if( result.length >= 1 ){
-                
                 let rack = []; 
-                
                 result.forEach( (letter) => {
                     let rack_tile = new Tile( letter.xCoordinate, letter.yCoordinate, LETTER_VALUES[letter.tileId].value, LETTER_VALUES[letter.tileId].score, letter.id)
                     rack.push(rack_tile);                   
                 }, this);  
-
+                console.log(rack);
                 return rack;
             }
             else{
@@ -360,6 +396,200 @@ const game_controller = () => {
         })
     }
 
+    this.get_unused_tiles = (game_id, tile_count) => {
+        return queries.get_unused_tiles(game_id, tile_count)
+        .then( (result)  => {
+            if( result.length >= 1 ){
+                
+                let unused_tiles = []; 
+                
+                result.forEach( (letter) => {
+                    let tile = new Tile( letter.xCoordinate, letter.yCoordinate, LETTER_VALUES[letter.tileId].value, LETTER_VALUES[letter.tileId].score, letter.id)
+                    unused_tiles.push(tile);                   
+                }, this);  
+
+                return unused_tiles;
+            }
+            else{
+                return false;
+            }
+        })
+    }
+
+    this.can_swap = (available_tiles, tiles_to_swap) => {
+        if(available_tiles[0].total >= tiles_to_swap.length)
+            return true;
+        else
+            return false;
+    }
+
+    this.get_tile_id = (tiles) => {
+        let id = '';
+        tiles.forEach( (tile) => {
+            id += tile.game_tile_id +','; 
+        }, this);  
+        id = id.slice(0, -1);
+        return id;
+    }
+
+    this.clear_tile_association = (can_swap, tiles_to_swap ) => {
+        
+        if(can_swap){
+            let tile_id = this.get_tile_id(tiles_to_swap);
+            return queries.clear_tile_association(tile_id);
+        }
+        else
+            return false;
+    }
+
+    this.assign_tile_user = (user_id, tiles ) => {
+        let tile_id = this.get_tile_id(tiles);
+        return queries.assign_tile_user(user_id, tile_id)
+        .then(result => {
+            return tiles;
+        });
+    }
+
+    this.swap_user_tiles = (user_id, game_id, tiles_to_swap) => {
+        return queries.get_remaining_tile_count(game_id)
+            .then(data => this.can_swap(data, tiles_to_swap))
+            .then(result => this.clear_tile_association(result, tiles_to_swap))
+            .then(_ => this.get_unused_tiles(game_id, tiles_to_swap.length))
+            .then(swapped_tiles => this.assign_tile_user(user_id, swapped_tiles ));
+            
+    }
+
+    //FUNCTION TO GET TILES TABLE
+    this.load_tiles = () => {
+        return queries.load_tiles()
+        .then(result => {
+            return result;
+        })
+    }
+
+    this.initialize_game_db = ( game_id ) => {
+        return queries.load_tiles()
+        .then( tiles => {
+            return populate_game_tiles(game_id, tiles) }
+        );
+    }
+      
+    //FUNCTION TO POPULATE TILES ON INIT
+    async function populate_game_tiles (game_id, tiles){
+        for( let index = 0; index < tiles.length; index++ ){
+            let tile = tiles[ index ];
+            let inserted = await queries.populate_game_tiles(game_id, tile);
+        }
+        return true;
+    }
+
+    this.update_player_rack = (is_valid, game_id, user_id, new_tile_count) => {
+        if(is_valid){
+            return this.get_unused_tiles(game_id, new_tile_count)
+            .then(unused_tiles => {
+               return this.assign_tile_user(user_id, unused_tiles )}
+            );
+        }
+        else{
+            return false;
+        }
+    }
+
+    this.create_player_rack = (game_id, user_id) => {
+        return this.get_unused_tiles(game_id, 7)
+            .then(unused_tiles => {
+               return this.assign_tile_user(user_id, unused_tiles )}
+            );
+    }
+
+
+    this.get_game = (game_id) => {
+        return queries.get_game(game_id)
+        .then(result => {
+            return result[0];
+        })
+    }
+
+    this.change_game_status = (game_id) => {
+        return queries.change_game_status( game_id );
+    }
+    this.get_game_users = (game_id) => {
+        return queries.get_game_users(game_id)
+        .then(result => {
+            return result;
+        })
+    }
+
+    this.update_game_tiles = (all_words, new_tiles) => {
+        if(all_words){
+            new_tiles.forEach( (tile) => {
+                queries.place_game_tiles(tile); 
+            }, this);
+
+            return all_words;
+        }
+        else{
+            return false;
+        }
+    }
+
+    this.game_tiles_created = (game_id) => {
+        return queries.game_tiles_exist( game_id )
+        .then( result => {
+            if ( result.length > 0 ){
+                return true;
+            }
+            else{
+                return false;
+            }
+        })
+    }
+
+    this.creator_created_game = (game_id, user_id) => {
+        return this.initialize_game_db( game_id )
+        .then( _ => {
+            return this.create_player_rack( game_id, user_id )
+        })
+        .then( _ => this.change_game_status ( game_id) );
+    }
+
+    this.create_rack_required = ( game_id, user_id ) => {
+        return queries.select_player_rack(user_id, game_id)
+        .then( rack => {
+            if( rack.length > 0 ){
+                return true;
+            }
+            else{
+                return this.create_player_rack(game_id, user_id)
+                .then( _ =>  true);
+            }
+        })
+    }
+
+    this.update_player_score = (game_id, user_id, move_score) => {
+        if(move_score){
+            return queries.update_player_score(game_id, user_id, move_score)
+            .then( _ => true);
+        }else {
+            return false;
+        }
+    }
+
+    this.get_game_user = (game_id, user_id) => {
+        return queries.get_game_user(game_id, user_id)
+        .then(result => {
+            return result;
+        })
+    }
+
+    this.get_remaining_tiles = ( game_id ) => {
+        return queries.get_remaining_tiles( game_id );
+    }
+
+    this.get_game_scores = (game_id) => {
+        return queries.get_game_scores( game_id);
+    }
+    
     return this;
 }
 module.exports = game_controller;

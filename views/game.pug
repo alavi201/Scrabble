@@ -4,12 +4,12 @@ block content
   script(type="text/javascript", src="/socket.io/socket.io.js")
   script(type="text/javascript", src="/javascripts/chat.js")
   script(type="text/javascript", src="/javascripts/game.js")
-  h1= title
-  p Welcome to #{title}
-
+  //- h1= title
+  //- p Welcome to #{title}
+  
   div.container-fluid.col-sm-12
-    div.col-sm-9
-      table(id='board')
+    div.col-sm-7
+      table.board(id='board',style="margin-left:10%;")
         tbody 
           each row in game_board
             tr
@@ -17,33 +17,53 @@ block content
               each tile in row
                 if tile
                   if tile.letter != 0
-                    td.board_tile(data-row=tile.row, data-column=tile.column)= tile.letter.value
+                    td.board_tile.placed_tile(data-row=tile.row, data-column=tile.column,class=tile.letter.value.toLowerCase())
                   else if tile.premium != 0
                     td.board_tile(data-row=tile.row, data-column=tile.column)= tile.premium
                   else
-                    td.board_tile(data-row=tile.row, data-column=tile.column)= '.'
+                    td.board_tile(data-row=tile.row, data-column=tile.column)
       br
-      br
-      h4 My Score: 34
-      table
-        thead
-          tr
-            th.rack.head(colspan='7') Rack
-        tbody
-          tr
-            each tile in rack
-              td.rack.letter=tile.value
-      br
+      .row.well
+        div#rack_container.col-sm-10.col-sm-push-2(style="visibility:hidden;")
+          table#rack-holder
+          //- thead
+          //-   tr
+          //-     th.rack.head(colspan='7') Rack
+          //- tbody
+          //-   tr
+          //-     each tile in rack
+          //-       td.rack.letter(data-row_id=tile.game_tile_id)=tile.value
+        .col-sm-10.col-sm-push-1
+          h5#feedback_message(style="width:80%;text-align:center;") Waiting for players to join the game
+        div#game_controls.col-sm-10.col-sm-push-1(style="visibility:hidden;")
+          br
+          button.col-sm-3.btn.btn-primary(id='play') Play
+          button.col-sm-3.btn.btn-warning(id='swap') Swap
+          button.col-sm-3.btn.btn-danger(id='pass') Pass
+          button.col-sm-9.btn.btn-success.confirmation Confirm Action
 
-      div.col-sm-9
-        button.col-sm-3(id='play') Play
-        button.col-sm-3 Swap
-        button.col-sm-3 Pass
-
-    div.col-sm-3
-      div
-        h3 Remaining Tiles: 
-          p(id='tile_count') 56
+        
+    
+    //- div.col-sm-3
+    //-   br
+    //-   br
+    //-   h4 My Score: 34
+      
+      
+    //-   br
+    div.col-sm-5
+      h4 SCORE
+      table#players.col-sm-6
+        
+      div#tile-count.col-sm-6(style="visibility: hidden;")
+        h5 Remaining Tiles: 
+          p(id='tile_count') 100
 
       
-      include chat.pug
+      div.col-sm-10
+        include chat.pug
+    br
+    br
+    br
+  input#gameId(type="hidden", name="gameId" ,value=game_id)    
+      
