@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller')();
-const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS, GAME_STARTED, JOINED } = require('../../constants/events');
+const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS, GAME_STARTED, JOINED, CHANGE_TURN } = require('../../constants/events');
 
 
 const game = app => {
@@ -50,14 +50,23 @@ const game = app => {
   }
   
   const validate_play = (client_data, socket) => {
+    console.log("in validate_play------------------");
     data = client_data.play;
     user_id = client_data.user_id;
     game_id = client_data.game_id;
     if( data.length > 0 ){
+      console.log("before validated-------------------")      
       return controller.validate_game_play( user_id, game_id, data )
       .then( is_validated => {
+        console.log("in validate play then"+is_validated);
         if( is_validated ){
+          console.log("after validated--------------");
           socket.broadcast.in( game_id ).emit( TILE, data );
+          return controller.get_current_turn (user_id, game_id)
+          .then( current_user_row =>{
+            io.in(game_id).emit(CHANGE_TURN,current_user_row);
+            return true;
+          });
         }
         else{
           socket.in( game_id ).emit( INVALID_MOVE, data );
@@ -183,7 +192,11 @@ const game = app => {
       let game_id = data.game_id;
       let user_id = data.user_id;
       socket.join( game_id );
-  
+      /*return controller.get_current_turn (user_id, game_id)
+      .then( current_user_row =>{
+        io.in(game_id).emit(CHANGE_TURN,current_user_row);
+        return true;
+      });*/
       return run_socket_connected( game_id, socket, user_id);
     } 
 
