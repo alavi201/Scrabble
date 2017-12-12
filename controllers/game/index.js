@@ -160,7 +160,7 @@ const game = app => {
     })
     .then( result => {
       if( result ){
-        return ontroller.create_rack_required( game_id, user_id ) 
+        return controller.create_rack_required( game_id, user_id ) 
       }
       else{
         return controller.creator_created_game( game_id, user_id )

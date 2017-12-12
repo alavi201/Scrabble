@@ -7,6 +7,7 @@ function attach_sockect_events( socket ){
     socket.on('swap', swap_received);
     socket.on('create rack', create_rack);
     socket.on('display players', display_players);
+    socket.on('display board', display_board);
     socket.on('turn', turn);
 }
 
@@ -171,6 +172,48 @@ function display_players( players ){
         
         tbody.appendChild(tr);
     }, this)
+    table.appendChild(tbody);
+}
+
+function display_board(board_data){
+    let board = board_data[2];
+	let table = document.getElementById("board");
+	table.innerHTML = '';
+    let tbody = document.createElement('tbody');
+    //debugger;
+
+    let row = '';
+    let tile = '';
+    let i = 1;
+    let j = 1;
+
+    for(i = 1; i<16; i++){
+        row = board[i];
+
+        let tr = document.createElement("tr");
+
+        for(j = 1; j<16; j++){
+            tile = row[j];
+
+            let td = document.createElement("td");
+	        td.className += 'board_tile';
+			td.setAttribute('data-row', tile.row);
+	        td.setAttribute('data-column', tile.column);
+	        
+	        if(tile.letter != 0){
+	        	td.className += ' placed_tile';
+	        	td.className += ' '+tile.letter.value.toLowerCase();
+	        	td.value = tile.letter.value;
+	        }
+	        else if(tile.premium != 0){
+	        	td.value = tile.premium
+	        }
+	        tr.appendChild(td);
+        }
+
+        tbody.appendChild(tr);
+    }
+
     table.appendChild(tbody);
 }
 
