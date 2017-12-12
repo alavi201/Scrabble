@@ -1,48 +1,55 @@
 extends layout
 
 block content
-                        
-  .container-fluid.scrollable
-      .right-section
-          table
-            thead
-              tr
-                th.rack.head(colspan='3') Leadership Board
-            tbody
-              tr
-                each val in ['Name','Win%','Score']
-                  td.next.value= val
-            h2 Chat
-          div.chatwindow
-             include chat.pug
-      .left-section
-          form(method='POST' action='')
-              h1 Create New Game
-              .column
-                | Select Players
+  script(type="text/javascript", src="/socket.io/socket.io.js")
+  script(type="text/javascript", src="/javascripts/chat.js")
+  script(type="text/javascript", src="/javascripts/lobby.js")
+
+  h1.header_lobby LOBBBY           
+  .container-fluid
+      
+      .col-sm-3.create-game
+        form.well(method='POST' action='')
+            h4 CREATE NEW GAME 
+            .column
+                | No. of Players
                 |&nbsp;
                 select(name="playervalue")
                   option(value=2) 2
                   option(value=3) 3
                   option(value=4) 4
-              .column
-                button.btn.btn-primary(type='submit') Create Game
-              .column
-              form(method='POST' action='/joinGame')
-                table
-                  thead
-                    tr
-                      th.rack.head(colspan='3') Games
-                      tr
-                      each val in ['Created By','Number of Players','Status','Join/Spectate']
-                        td.next.value= val 
-                  tbody
-                    each row in games
-                      tr
-                        td.game_row.value= row.creator_id
-                        td.game_row.value=row.num_players
-                        td.game_row.value=row.status
-                        td
-                          a(href='/joinGame/'+row.id) Join
+            .column
+              button.btn.btn-primary(type='submit') Create Game
+              
+      .col-sm-5.well(style="height:480px; overflow:scroll;")
+        form(method='POST' action='/joinGame')
+            table.table.table-striped.ongoing-games
+              thead.thead-dark
+                 tr
+                  th.rack.head(colspan='4') Game List
+                  tr
+                   each val in ['Created By','Number of Players','Status','Join']
+                    td.next.value= val 
+              tbody
+                each row in games
+                  tr
+                    td.game_row.value= row.creator_id
+                    td.game_row.value=row.num_players
+                    td.game_row.value=row.status
+                    td
+                      a(href='/joinGame/'+row.id style="float:center;") JOIN
+      .col-sm-4.well
+          //- table
+          //-   thead
+          //-     tr
+          //-       th.rack.head(colspan='3') Leadership Board
+          //-   tbody
+          //-     tr
+          //-       each val in ['Name','Win%','Score']
+          //-         td.next.value= val
+          h1.header_lobby CHAT
+          include chat.pug
+          
+          
 
 

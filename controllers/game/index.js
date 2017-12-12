@@ -213,7 +213,6 @@ const game = app => {
     socket.on( PASS, socket_pass);
 
     socket.on( DISCONNECT, () => {
-      console.log( 'socket disconnected for user:' + socket.user_id );
     }); 
 
   });
