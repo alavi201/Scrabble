@@ -3,6 +3,11 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     queryInterface.createTable('game_tiles', {
+      id:{
+        type: Sequelize.BIGINT,
+        primaryKey: true,
+        autoIncrement: true
+      },
       gameId: {
         type: Sequelize.BIGINT,
         allowNull: false,
@@ -19,13 +24,9 @@ module.exports = {
           key: 'id'
         }
       },
-      playerId: {
+      player_id: {
         type: Sequelize.BIGINT,
-        allowNull: false,
-        references: {
-          model: 'users',
-          key: 'id'
-        }
+        allowNull: true,
       },
       xCoordinate: {
         type: Sequelize.INTEGER,

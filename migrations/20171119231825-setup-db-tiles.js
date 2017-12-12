@@ -14,9 +14,13 @@ module.exports = {
           allowNull: false
         },
         letter: {
-          type: Sequelize.CHAR,
+          type: Sequelize.STRING,
           allowNull: false,
           unique: true
+        },
+        count:{
+          type: Sequelize.INTEGER,
+          allowNull: false
         }
       }
 

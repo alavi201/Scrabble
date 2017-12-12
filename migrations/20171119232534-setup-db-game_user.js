@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true
       },
-      userId: {
+      user_id: {
         type: Sequelize.BIGINT,
         allowNull: false,
         references: {
@@ -17,7 +17,7 @@ module.exports = {
           key: 'id'
         }
       },
-      gameId: {
+      game_id: {
         type: Sequelize.BIGINT,
         allowNull: false,
         references: {
@@ -31,11 +31,11 @@ module.exports = {
       },
       is_spectator: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: true
       },
-      updatedAt: {
+      updated_at: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: true
       }
     });
   },

@@ -1,0 +1,8 @@
+.row#chat-container.chatwindow
+  .col-sm-12#chat-box
+    ul#messages.list-unstyled
+.row
+    form#chat-form.input-group(method='post')
+        input#chat-input.submit_on_enter.form-control(type='text', name='chat-text', autocomplete='off' style="margin-top:5px;")
+        span.input-group-btn
+            button#send-button.btn.btn-primary(type='button', onclick='sendMessage()', value='Send' ) Send
