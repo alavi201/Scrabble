@@ -21,9 +21,9 @@ const game_controller = () => {
         return queries.select_new_game_user( user_id, game_id )
     };
 
-    this.process_message = (message_data, user_id) => {
+    this.process_message = (message_data, user_name) => {
         return new Promise(( resolve, reject ) => {
-            message_data = user_id + " : " + message_data;
+            message_data = user_name + " : " + message_data;
             resolve( message_data );
         })
     };
@@ -38,6 +38,10 @@ const game_controller = () => {
         .then( this.validate_move )
         .then( result => this.update_game_tiles( result, play_data))
         .then( this.calculate_move_score)
+        .catch( err => {
+            console.log( "error in validate_game_play");
+            console.log( err );
+        })
         
 
     };
@@ -536,7 +540,6 @@ const game_controller = () => {
         })
     }
     
-
     return this;
 }
 module.exports = game_controller;

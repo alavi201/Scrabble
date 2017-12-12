@@ -31,8 +31,12 @@ function swap_clicked(){
     $('.rack.letter').removeClass('letter').addClass('swappable');
 }
 
-function play_clicked( socket ){        
-    socket.emit('tile',current_play);
+function play_clicked( socket ){
+    let data = get_client_data();
+    data.play = current_play;
+
+    socket.emit('tile',data);
+    
     console.log(current_play);
     $('.empty').each(function(i, obj){
         $(this).html(String.fromCharCode(Math.floor(Math.random() * 26) + 65));
@@ -88,6 +92,7 @@ $(document).ready(function() {
     initChat(socket);    
     attach_sockect_events(socket);
     add_events(socket);
+    join_game( socket );
     
 });
 
@@ -102,7 +107,11 @@ function rack_swappable_clicked(){
 }
 
 function confirmation_clicked(){
-    socket.emit('swap',tiles_to_swap);
+    let client_data = get_client_data();
+    client_data.play = tiles_to_swap;
+
+    socket.emit('swap',client_data);
+
     console.log(tiles_to_swap);
     $(tiles_to_swap).each(function(i, letter){
         $('td[data-row_id='+letter.game_tile_id+']').removeClass(letter.value.toLowerCase());  
@@ -169,4 +178,20 @@ function turn(){
     $('#play').removeAttr('disabled');
     $('#swap').removeAttr('disabled');
     $('#pass').removeAttr('disabled');
+}
+
+function join_game( socket ){
+    let data = new Object();
+    data.user_id = document.getElementById("userId").value;
+    data.user = document.getElementById("user").value;
+    data.game_id = document.getElementById("gameId").value;
+    socket.emit( 'join game', data );
+}
+
+function get_client_data (){
+    let data = new Object();
+    data.user_id = document.getElementById("userId").value;
+    data.user = document.getElementById("user").value;
+    data.game_id = document.getElementById("gameId").value;
+    return data;
 }

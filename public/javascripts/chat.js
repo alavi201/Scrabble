@@ -17,7 +17,11 @@ function initChat(inputSocket) {
 function sendMessage() {
     let message = document.getElementById("chat-input").value;
     document.getElementById("chat-input").value = "";
-    socket.emit('client chat message', message);
+    let data = new Object();
+    data.message = message;
+    data.user_id = document.getElementById("userId").value;
+    data.user = document.getElementById("user").value;
+    socket.emit('client chat message', data);
 }
 
 function chat_received(message) {

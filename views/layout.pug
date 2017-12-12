@@ -36,3 +36,6 @@ html
                           a(href='/lobby') Lobby
                           a(href='#') My Account
                           a(href='/logout') Logout
+                          a(style="color: black", hover="color: initial") Hello #{user_name}
+                          input#user(type="hidden", name="user_name" ,value=user_name) 
+                          input#userId(type="hidden", name="user_id" ,value=user_id) 

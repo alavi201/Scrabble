@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller')();
-const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS, GAME_STARTED } = require('../../constants/events');
+const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS, GAME_STARTED, JOINED } = require('../../constants/events');
 
 
 const game = app => {
   
-
+  let user_id;
+  let game_id;
   let io = app.io.of('/game');
 
   router.get('/:gameId', function(request, response, next) {
@@ -39,29 +40,32 @@ const game = app => {
       return controller.get_game_board([0, 0], game_id)
       .then( result => {
         if( result[2] ){
-          response.render('game', { title: 'Game', game_board: result[2]});
+          response.render('game', { title: 'Game', user_id: user_id, user_name: request.session.user, game_id: game_id, game_board: result[2]});
         }
         else{
-          response.render('game', { title: 'Game' });
+          response.render('game', { title: 'Game', user_id: user_id, user_name: request.session.user,game_id: game_id });
         }
       });
     }
   }
   
-  const validate_play = (data, game_id, user_id, socket) => {
+  const validate_play = (client_data, socket) => {
+    data = client_data.play;
+    user_id = client_data.user_id;
+    game_id = client_data.game_id;
     if( data.length > 0 ){
       return controller.validate_game_play( user_id, game_id, data )
       .then( is_validated => {
         if( is_validated ){
-          socket.broadcast.in( socket.room ).emit( TILE, data );
+          socket.broadcast.in( game_id ).emit( TILE, data );
         }
         else{
-          socket.in( socket.room ).emit( INVALID_MOVE, data );
+          socket.in( game_id ).emit( INVALID_MOVE, data );
         }
       })
     }
     else{
-      socket.in( socket.room ).emit( NO_DATA, data );
+      socket.in( game_id ).emit( NO_DATA, data );
     }
 
   };
@@ -84,15 +88,15 @@ const game = app => {
 
   }; 
 
-  const process_chat_message = (data) => {
-    return controller.process_message( data, user_id)
+  const process_chat_message = (data, io) => {
+    return controller.process_message( data.message, data.user)
     .then( data => {
       io.in( game_id ).emit(CHAT_RECEIVED, data);
     })
     console.log('chat message: ' + data );
   }
 
-  const check_game_full = ( game, app  ) => {
+  const check_game_full = ( game, app ) => {
     let ready_to_start;
     let playerCount = app.io.nsps['/game'].adapter.rooms[game_id].length;
     let max_number_players = parseInt(game.num_players);
@@ -138,7 +142,14 @@ const game = app => {
     if( ready_to_start ){
       io.in( game_id ).emit(GAME_STARTED, "game started");
     }
+    return true;
   }
+
+  const display_player_score = (game_id, socket) => {
+    controller.get_game_users(game_id)
+    .then( users => socket.emit( DISPLAY_PLAYERS, users));
+  }
+  
 
   const run_socket_connected = (game_id, socket, user_id) => {
     let current_game;
@@ -156,8 +167,9 @@ const game = app => {
       }
     })
     .then( _ => emit_rack(socket, game_id, user_id))
-    .then( _ => check_game_full( current_game ))
-    .then( emit_start_game );
+    .then( _ => check_game_full( current_game, app ))
+    .then( emit_start_game )
+    .then( _ => display_player_score(game_id, socket))
   }
 
   const pass = (socket, data) => {
@@ -166,34 +178,44 @@ const game = app => {
   }
 
   io.on( CONNECTION, socket => {
-    console.log('In game sockets for user:' + user_id + " game id: "+ game_id);
-    if( socket.room ){
-      console.log('game socket emits already added for:' + user_id + " game id: "+ game_id);
+    
+    const on_socket_connection = (data) => {
+      let game_id = data.game_id;
+      let user_id = data.user_id;
+      socket.join( game_id );
+  
+      return run_socket_connected( game_id, socket, user_id);
     } 
-    else {
-      socket.room = game_id;
-      socket.user_id = user_id;
-      socket.join( socket.room );
 
-      console.log("-----------------Socket Connected------------------");
-      console.log("User ID: "+user_id + " and game ID: " + game_id);
-      console.log("Number of players in Room:"+game_id+" are: "+app.io.nsps['/game'].adapter.rooms[game_id].length);
-
-      run_socket_connected( game_id, socket, user_id);
-
-      socket.on( CHAT_MESSAGE, process_chat_message);
-      socket.on( TILE, data => validate_play(data, game_id, user_id, socket));
-      socket.on( SWAP, data => swap(data, game_id, user_id, socket));        
-      socket.on( PASS, data => pass(data, socket));
-
-      //Move this to game start event
-      controller.get_game_users(game_id)
-      .then( users => socket.emit( DISPLAY_PLAYERS, users));
-      
-      socket.on( DISCONNECT, () => {
-        console.log( 'socket disconnected for user:' + socket.user_id );
-      }); 
+    const socket_process_chat_message = (data) => {
+      return process_chat_message(data, io);
     }
+
+    const socket_validate_play = ( data ) => {
+      return validate_play(data, socket)
+    }
+
+    const socket_swap = (client_data) => {
+      let game_id = data.game_id;
+      let user_id = data.user_id;
+      let data = data.play; 
+      return swap(data, game_id, user_id, socket);
+    }
+
+    const socket_pass = (data) => {
+      return pass(data, socket);
+    }
+    
+    socket.on( JOINED, on_socket_connection );
+    socket.on( CHAT_MESSAGE, socket_process_chat_message);
+    socket.on( TILE, socket_validate_play);
+    socket.on( SWAP, socket_swap);        
+    socket.on( PASS, socket_pass);
+
+    socket.on( DISCONNECT, () => {
+      console.log( 'socket disconnected for user:' + socket.user_id );
+    }); 
+
   });
 
   return router;

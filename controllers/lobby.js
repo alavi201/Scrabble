@@ -14,11 +14,9 @@ router.get('/', function(req, res, next) {
     session=req.session;
 
     if(session.user){
-        //console.log('before sendGame');
         sendGameDetails(req,res);
     }
     else{
-        //console.log('before redirect to login');
         res.redirect('/login');
     }
         
@@ -43,7 +41,7 @@ function sendGameDetails(req, res)
     database.get_games(req,res)
     .then((data) => {
     
-    res.render('lobby',{title:'Lobby Page',games: data});
+    res.render('lobby',{title:'Lobby Page',games: data, user_id: req.session.player_id, user_name: req.session.user });
  });
 }
     
