@@ -58,6 +58,7 @@ const game = app => {
       .then( is_validated => {
         if( is_validated ){
           socket.broadcast.in( game_id ).emit( TILE, data );
+          display_player_score(game_id);
         }
         else{
           socket.in( game_id ).emit( INVALID_MOVE, data );
@@ -145,9 +146,9 @@ const game = app => {
     return true;
   }
 
-  const display_player_score = (game_id, socket) => {
+  const display_player_score = (game_id) => {
     controller.get_game_users(game_id)
-    .then( users => socket.emit( DISPLAY_PLAYERS, users));
+    .then( users => io.in(game_id).emit( DISPLAY_PLAYERS, users));
   }
   
 
@@ -169,7 +170,7 @@ const game = app => {
     .then( _ => emit_rack(socket, game_id, user_id))
     .then( _ => check_game_full( current_game, app ))
     .then( emit_start_game )
-    .then( _ => display_player_score(game_id, socket))
+    .then( _ => display_player_score(game_id))
   }
 
   const pass = (socket, data) => {

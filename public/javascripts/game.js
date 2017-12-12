@@ -153,6 +153,7 @@ function create_rack( rack ){
 
 function display_players( players ){
     let table = document.getElementById("players");
+    table.innerHTML = '';
     let tbody = document.createElement('tbody');
     console.log(players);
     players.forEach( (player) => {
@@ -166,7 +167,7 @@ function display_players( players ){
 
         let score_td = document.createElement("td");
         score_td.className += 'score';
-        score_td.innerHTML = '0';
+        score_td.innerHTML = player.score;
         score_td.setAttribute('data-user_id', player.user_id);
         tr.appendChild(score_td);
         
