@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller')();
-const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS, GAME_STARTED, JOINED } = require('../../constants/events');
+const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS, GAME_STARTED, JOINED, REMAINING_TILES } = require('../../constants/events');
 
 
 const game = app => {
@@ -61,6 +61,8 @@ const game = app => {
           .then(board => io.in(game_id).emit( 'display board', board ));
           display_player_score(game_id);
           emit_rack( socket, game_id, user_id );
+          controller.get_remaining_tiles( game_id )
+          .then( remaining_tiles_count => io.in(game_id).emit( REMAINING_TILES,remaining_tiles_count[0].count ));
         }
         else{
           controller.get_game_board( [0, 0], game_id)
@@ -175,6 +177,10 @@ const game = app => {
     .then( _ => check_game_full( current_game, app ))
     .then( emit_start_game )
     .then( _ => display_player_score(game_id))
+    .then( _ => {
+      controller.get_remaining_tiles( game_id )
+      .then( remaining_tiles_count => io.in(game_id).emit( REMAINING_TILES,remaining_tiles_count[0].count ));
+    })
   }
 
   const pass = (socket, data) => {

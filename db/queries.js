@@ -127,6 +127,10 @@ const queries = database => {
          })
     };
 
+    this.get_remaining_tiles = ( game_id ) => {
+        return database.any( 'select count(1) from game_tiles where "gameId" = $1 and player_id is null',[ game_id ] );
+    }
+
     return this;
 };
 module.exports = queries;

@@ -9,6 +9,12 @@ function attach_sockect_events( socket ){
     socket.on('display players', display_players);
     socket.on('display board', display_board);
     socket.on('turn', turn);
+    socket.on( 'remaining tiles', show_remaining_tiles );
+}
+
+function show_remaining_tiles( remaining_tiles ){
+    let tile_count = document.getElementById('tile_count');
+    tile_count.innerText = remaining_tiles;
 }
 
 function swap_received(swapped_tiles){

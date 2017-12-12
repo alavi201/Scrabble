@@ -577,6 +577,10 @@ const game_controller = () => {
             return result;
         })
     }
+
+    this.get_remaining_tiles = ( game_id ) => {
+        return queries.get_remaining_tiles( game_id );
+    }
     
     return this;
 }
