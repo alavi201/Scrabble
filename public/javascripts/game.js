@@ -10,6 +10,26 @@ function attach_sockect_events( socket ){
     socket.on('display board', display_board);
     socket.on('turn', turn);
     socket.on( 'remaining tiles', show_remaining_tiles );
+    socket.on( 'game started', game_started );
+}
+
+function game_started( data ){
+    let tile_count = document.getElementById("tile-count");
+    tile_count.style.visibility = "visible";
+
+    let rack_container = document.getElementById("rack_container");
+    let game_controls = document.getElementById("game_controls");
+    let feedback_lbl = document.getElementById("feedback_message");
+    if( data == "" ){
+        rack_container.style.visibility = "visible";
+        game_controls.style.visibility = "visible";
+        feedback_lbl.innerHTML = "";
+    }
+    else{
+        rack_container.style.visibility = "hidden";
+        game_controls.style.visibility = "hidden";
+        feedback_lbl.innerHTML = data;
+    }
 }
 
 function show_remaining_tiles( remaining_tiles ){

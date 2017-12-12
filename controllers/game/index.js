@@ -147,7 +147,7 @@ const game = app => {
 
   const emit_start_game = ( ready_to_start ) => {
     if( ready_to_start ){
-      io.in( game_id ).emit(GAME_STARTED, "game started");
+      io.in( game_id ).emit(GAME_STARTED, "");
     }
     return true;
   }
