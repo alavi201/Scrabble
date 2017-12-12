@@ -131,6 +131,10 @@ const queries = database => {
         return database.any( 'select count(1) from game_tiles where "gameId" = $1 and player_id is null',[ game_id ] );
     }
 
+    this.get_game_scores = ( game_id ) => {
+        return database.any('select username as "user_id", score from game_user join users on game_user.user_id = users.id and game_id = $1',[game_id]);
+    }
+
     return this;
 };
 module.exports = queries;

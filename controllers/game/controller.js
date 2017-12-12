@@ -585,6 +585,10 @@ const game_controller = () => {
     this.get_remaining_tiles = ( game_id ) => {
         return queries.get_remaining_tiles( game_id );
     }
+
+    this.get_game_scores = (game_id) => {
+        return queries.get_game_scores( game_id);
+    }
     
     return this;
 }

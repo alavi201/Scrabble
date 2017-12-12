@@ -153,7 +153,7 @@ const game = app => {
   }
 
   const display_player_score = (game_id) => {
-    controller.get_game_users(game_id)
+    controller.get_game_scores(game_id)
     .then( users => io.in(game_id).emit( DISPLAY_PLAYERS, users));
   }
   
