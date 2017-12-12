@@ -464,7 +464,9 @@ const game_controller = () => {
 
     this.initialize_game_db = ( game_id ) => {
         return queries.load_tiles()
-        .then( tiles => populate_game_tiles(game_id, tiles) );
+        .then( tiles => {
+            return populate_game_tiles(game_id, tiles) }
+        );
     }
       
     //FUNCTION TO POPULATE TILES ON INIT
@@ -478,7 +480,9 @@ const game_controller = () => {
 
     this.create_player_rack = (game_id, user_id) => {
         return this.get_unused_tiles(game_id, 7)
-            .then(unused_tiles => this.assign_tile_user(user_id, unused_tiles ));
+            .then(unused_tiles => {
+               return this.assign_tile_user(user_id, unused_tiles )}
+            );
     }
 
 
@@ -524,7 +528,9 @@ const game_controller = () => {
 
     this.creator_created_game = (game_id, user_id) => {
         return this.initialize_game_db( game_id )
-        .then( _ => this.create_player_rack( game_id, user_id ))
+        .then( _ => {
+            return this.create_player_rack( game_id, user_id )
+        })
     }
 
     this.create_rack_required = ( game_id, user_id ) => {

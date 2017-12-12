@@ -24,13 +24,9 @@ module.exports = {
           key: 'id'
         }
       },
-      playerId: {
+      player_id: {
         type: Sequelize.BIGINT,
         allowNull: true,
-        references: {
-          model: 'users',
-          key: 'id'
-        }
       },
       xCoordinate: {
         type: Sequelize.INTEGER,
