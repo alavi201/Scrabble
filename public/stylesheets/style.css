@@ -71,7 +71,7 @@ th.rack.head{
 }
 
 td.rack{
-  display: inline-block;
+  display: table-cell;
   width: 155px;
   height: 155px;
   text-align: center;
@@ -109,8 +109,9 @@ table.board {
 }
 
 table td.board_tile.placed_tile{
-  zoom:18%;
+  zoom:19%;
   margin: 5px 0px 0px 5px;
+  display:table-cell;
 }
 
 .c {

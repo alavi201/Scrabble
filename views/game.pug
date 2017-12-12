@@ -23,23 +23,26 @@ block content
                   else
                     td.board_tile(data-row=tile.row, data-column=tile.column)
       br
-      .col-sm-11.col-sm-push-1
-        table#rack-holder
-        //- thead
-        //-   tr
-        //-     th.rack.head(colspan='7') Rack
-        //- tbody
-        //-   tr
-        //-     each tile in rack
-        //-       td.rack.letter(data-row_id=tile.game_tile_id)=tile.value
-      div.col-sm-12
-        br
-        button.col-sm-3.btn.btn-primary(id='play') Play
-        button.col-sm-3.btn.btn-warning(id='swap') Swap
-        button.col-sm-3.btn.btn-danger(id='pass') Pass
-        button.col-sm-9.btn.btn-success.confirmation Confirm Action
+      .row.well
+        div#rack_container.col-sm-10.col-sm-push-2(style="visibility:visible;")
+          table#rack-holder
+          //- thead
+          //-   tr
+          //-     th.rack.head(colspan='7') Rack
+          //- tbody
+          //-   tr
+          //-     each tile in rack
+          //-       td.rack.letter(data-row_id=tile.game_tile_id)=tile.value
+        .col-sm-10.col-sm-push-1
+          h5#feedback_message(style="width:80%;text-align:center;") Waiting for players to join the game
+        div#game_controls.col-sm-10.col-sm-push-1(style="visibility:visible;")
+          br
+          button.col-sm-3.btn.btn-primary(id='play') Play
+          button.col-sm-3.btn.btn-warning(id='swap') Swap
+          button.col-sm-3.btn.btn-danger(id='pass') Pass
+          button.col-sm-9.btn.btn-success.confirmation Confirm Action
 
-      
+        
     
     //- div.col-sm-3
     //-   br
