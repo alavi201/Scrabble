@@ -196,9 +196,9 @@ const game = app => {
     }
 
     const socket_swap = (client_data) => {
-      let game_id = data.game_id;
-      let user_id = data.user_id;
-      let data = data.play; 
+      let game_id = client_data.game_id;
+      let user_id = client_data.user_id;
+      let data = client_data.play; 
       return swap(data, game_id, user_id, socket);
     }
 
