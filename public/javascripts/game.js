@@ -8,7 +8,7 @@ function attach_sockect_events( socket ){
     socket.on('create rack', create_rack);
     socket.on('display players', display_players);
     socket.on('display board', display_board);
-    socket.on('turn', turn);
+    socket.on('change turn', turn);
     socket.on( 'remaining tiles', show_remaining_tiles );
     socket.on( 'game started', game_started );
 }
@@ -249,10 +249,11 @@ function display_board(board_data){
     table.appendChild(tbody);
 }
 
-function turn(){
+function turn(current_user_id){
     $('#play').removeAttr('disabled');
     $('#swap').removeAttr('disabled');
     $('#pass').removeAttr('disabled');
+    document.getElementById("current").value="Current player is"+current_user_id;
 }
 
 function join_game( socket ){
