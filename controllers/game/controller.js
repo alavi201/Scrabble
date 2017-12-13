@@ -637,6 +637,10 @@ const game_controller = () => {
     this.get_game_scores = (game_id) => {
         return queries.get_game_scores( game_id);
     }
+
+    this.get_user_id = (user_id) =>{
+        return queries.get_user_id(user_id);
+    }
     
     return this;
 }

@@ -10,10 +10,10 @@ function attach_sockect_events( socket ){
     socket.on('display board', display_board);
     socket.on('change turn', turn);
     socket.on( 'remaining tiles', show_remaining_tiles );
-    socket.on( 'game started', game_started );
+    socket.on( 'game started', block_game_label );
 }
 
-function game_started( data ){
+function block_game_label( data ){
     let tile_count = document.getElementById("tile-count");
     tile_count.style.visibility = "visible";
 
@@ -249,11 +249,14 @@ function display_board(board_data){
     table.appendChild(tbody);
 }
 
-function turn(current_user_id){
-    $('#play').removeAttr('disabled');
-    $('#swap').removeAttr('disabled');
-    $('#pass').removeAttr('disabled');
-    document.getElementById("current").value="Current player is"+current_user_id;
+function turn(next_turn_user){
+    current_user_name = document.getElementById("user").value;
+    if( current_user_name == next_turn_user){
+        block_game_label("");
+    }
+    else{
+        block_game_label(" It is "+next_turn_user+"'s turn")
+    }
 }
 
 function join_game( socket ){

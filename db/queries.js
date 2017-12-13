@@ -135,6 +135,10 @@ const queries = database => {
         return database.any('select username as "user_id", score from game_user join users on game_user.user_id = users.id and game_id = $1',[game_id]);
     }
 
+    this.get_user_id = (user_id) => {
+        return database.any( "select * from users where id = $1",[user_id]);
+    }
+
     return this;
 };
 module.exports = queries;

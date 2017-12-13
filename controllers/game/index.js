@@ -61,8 +61,13 @@ const game = app => {
           //turn function call
           controller.get_current_turn (user_id, game_id)
           .then( current_user_row =>{
-            io.in(game_id).emit(CHANGE_TURN,current_user_row);
-            return true;
+            if( current_user_row ){
+              controller.get_user_id( current_user_row )
+              .then( user_row => {
+                io.in(game_id).emit(CHANGE_TURN, user_row[0].username);
+                return true;
+              }) 
+            }
           });
           controller.get_game_board( [0, 0], game_id)
           .then(board => io.in(game_id).emit( 'display board', board ));
@@ -152,9 +157,11 @@ const game = app => {
     });
   }
 
-  const emit_start_game = ( ready_to_start ) => {
+  const emit_start_game = ( ready_to_start, game_id ) => {
     if( ready_to_start ){
-      io.in( game_id ).emit(GAME_STARTED, "");
+      controller.get_game( game_id )
+      .then( game => controller.get_user_id(game.creator_id))
+      .then( user => io.in( game_id ).emit(CHANGE_TURN, user[0].username))
     }
     return true;
   }
@@ -182,7 +189,7 @@ const game = app => {
     })
     .then( _ => emit_rack(socket, game_id, user_id))
     .then( _ => check_game_full( current_game, app ))
-    .then( emit_start_game )
+    .then( ready_to_start => emit_start_game( ready_to_start, game_id) )
     .then( _ => display_player_score(game_id))
     .then( _ => {
       controller.get_remaining_tiles( game_id )
