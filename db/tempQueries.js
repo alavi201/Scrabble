@@ -33,7 +33,7 @@ let database = function (db)  {
   }
 
   this.get_games = (req,res) =>{
-    return db.any("select * from games");
+    return db.any("select users.username as creator, games.* from users , games where games.creator_id = users.id");
   }
 
   this.insert_game_user = (gameId,req,res) =>{

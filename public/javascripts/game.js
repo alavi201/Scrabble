@@ -8,14 +8,46 @@ function attach_sockect_events( socket ){
     socket.on('create rack', create_rack);
     socket.on('display players', display_players);
     socket.on('display board', display_board);
-    socket.on('turn', turn);
+    socket.on('change turn', turn);
+    socket.on( 'remaining tiles', show_remaining_tiles );
+    socket.on( 'game started', block_game_label );
+}
+
+function block_game_label( data ){
+    let tile_count = document.getElementById("tile-count");
+    tile_count.style.visibility = "visible";
+
+    let rack_container = document.getElementById("rack_container");
+    let game_controls = document.getElementById("game_controls");
+    let feedback_lbl = document.getElementById("feedback_message");
+    if( data == "" ){
+        rack_container.style.visibility = "visible";
+        game_controls.style.visibility = "visible";
+        feedback_lbl.innerHTML = "";
+    }
+    else{
+        rack_container.style.visibility = "hidden";
+        game_controls.style.visibility = "hidden";
+        feedback_lbl.innerHTML = data;
+    }
+}
+
+function show_remaining_tiles( remaining_tiles ){
+    let tile_count = document.getElementById('tile_count');
+    tile_count.innerText = remaining_tiles;
 }
 
 function swap_received(swapped_tiles){
     $('.swapped').each(function(i, letter){
       $(this).html(swapped_tiles[i].value);
-      $(this).html(swapped_tiles[i]).addClass( swapped_tiles[i].value.toLowerCase() )
-    }); 
+      $(this).html(swapped_tiles[i]).addClass( swapped_tiles[i].value.toLowerCase() );
+      $(this).html(swapped_tiles[i]).removeClass( $(this).data('letter').toLowerCase());
+      $(this).attr('data-letter',swapped_tiles[i].value.toUpperCase());
+      $(this).html(swapped_tiles[i]).removeClass('active');
+    });
+    $('.swappble').each(function(i, letter){
+        $(this).removeClass('swappble');
+    });
 }
 
 function add_events( socket ){
@@ -62,7 +94,6 @@ function rack_letter_clicked(){
     
 function board_tile_clicked(){  
     let active_letter = $('.rack.letter.active');
-    //debugger;
     $(this).addClass("placed_tile");
     $(this).addClass(active_letter.val().toLowerCase());
     $(this).val(active_letter.val());
@@ -101,7 +132,6 @@ $(document).ready(function() {
 function rack_swappable_clicked(){
     $(this).addClass('swapped');
     $(this).css('background-color','#f7f6a8');
-    debugger;
     let letter = new Object();
     letter.game_tile_id = $(this).data('row_id');
     letter.value = $(this).data('letter');
@@ -183,7 +213,6 @@ function display_board(board_data){
 	let table = document.getElementById("board");
 	table.innerHTML = '';
     let tbody = document.createElement('tbody');
-    //debugger;
 
     let row = '';
     let tile = '';
@@ -220,10 +249,14 @@ function display_board(board_data){
     table.appendChild(tbody);
 }
 
-function turn(){
-    $('#play').removeAttr('disabled');
-    $('#swap').removeAttr('disabled');
-    $('#pass').removeAttr('disabled');
+function turn(next_turn_user){
+    current_user_name = document.getElementById("user").value;
+    if( current_user_name == next_turn_user){
+        block_game_label("");
+    }
+    else{
+        block_game_label(" It is "+next_turn_user+"'s turn")
+    }
 }
 
 function join_game( socket ){

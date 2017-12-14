@@ -5,7 +5,7 @@ block content
   script(type="text/javascript", src="/javascripts/chat.js")
   script(type="text/javascript", src="/javascripts/lobby.js")
 
-  h1.header_lobby LOBBBY           
+  h1.header_lobby LOBBY           
   .container-fluid
       
       .col-sm-3.create-game
@@ -28,17 +28,17 @@ block content
                  tr
                   th.rack.head(colspan='4') Game List
                   tr
-                   each val in ['Created By','Number of Players','Status','Join']
+                   each val in ['Created By','Required Players Per Game','Join']
                     td.next.value= val 
               tbody
                 each row in games
                   tr
-                    td.game_row.value= row.creator_id
+                    td.game_row.value= row.creator
                     td.game_row.value=row.num_players
-                    td.game_row.value=row.status
+                    //- td.game_row.value=(row.status == 1 ? 'Game Already Started' : "Waiting For Players")
                     td
                       a(href='/joinGame/'+row.id style="float:center;") JOIN
-      .col-sm-4.well
+      .col-sm-4.well(style="height:480px;")
           //- table
           //-   thead
           //-     tr
@@ -49,7 +49,3 @@ block content
           //-         td.next.value= val
           h1.header_lobby CHAT
           include chat.pug
-          
-          
-
-
