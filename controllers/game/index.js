@@ -197,9 +197,21 @@ const game = app => {
     })
   }
 
-  const pass = (socket, data) => {
-    socket.broadcast.in( socket.room ).emit( PASS);
-    console.log('In pass event for user: '+ socket.user_id);
+  const pass = (client_data, socket) => {
+    user_id = client_data.user_id;
+    game_id = client_data.game_id;
+    controller.get_current_turn (user_id, game_id)
+    .then( current_user_row =>{
+      if( current_user_row ){
+        controller.get_user_id( current_user_row )
+        .then( user_row => {
+          io.in(game_id).emit(CHANGE_TURN, user_row[0].username);
+          return true;
+        }) 
+      }
+    });
+    //socket.broadcast.in( socket.room ).emit( PASS);
+    //console.log('In pass event for user: '+ socket.user_id);
   }
 
   io.on( CONNECTION, socket => {
