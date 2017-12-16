@@ -77,15 +77,19 @@ const game_controller = () => {
     };
 
     this.validate_game_play = ( user_id, game_id, play_data ) => {
+        let board;
         return this.create_tiles( play_data )
         .then( this.get_orientation )
         .then( result => this.get_game_board( result, game_id)  )
         .then( this.place_new_tiles )
-        .then( this.find_starting_letter_accordingly )
+        .then( result => {
+            board = result[1];
+            return  this.find_starting_letter_accordingly(result);
+        })
         .then( this.extract_word )
         .then( this.validate_move )
         .then( result => this.update_game_tiles( result, play_data))
-        .then( result => this.calculate_move_score(game_id, user_id, result))
+        .then( result => this.calculate_move_score(game_id, user_id, result, board))
         .then( result => this.update_player_rack(result, game_id, user_id, play_data.length))
         .catch( err => {
             console.log( "error in validate_game_play");
@@ -234,9 +238,39 @@ const game_controller = () => {
         for(var i = 1 ; i < 16; i++) {
             for(var j = 1 ; j < 16; j++) {
                 board[i][j] = new BoardTile(i, j);
+                board[i][j].premium = this.get_premium(i, j);
             }
         }
         return board;
+    }
+
+    this.get_premium = (row, column) => {
+        
+        let premium_type = 0;
+
+        let middle = 8;
+        let halfMiddle = 4;
+
+        if ((row == 1 || row == 16 - 1 || row == middle) && (column == 1 || column == 16 - 1 || column == middle && row != middle)) {
+		    premium_type = 'TW';
+	    } else if (row > 1 && row < middle - 2 && (column == row || column == 16 - row)
+		       || row > middle + 2 && row < 16 - 1 && (row == column || row == 16 - column)) {
+            premium_type = 'DW';
+		} else if ((row == middle - 1 || row == middle + 1)
+		       && (column == middle - 1 || column == middle + 1)
+		       || (row == 1 || row == 16 - 1 || row == middle) && (column == middle + halfMiddle || column == middle - halfMiddle)
+		       || (column == 1 || column == 16 - 1 || column == middle) && (row == middle + halfMiddle || row == middle - halfMiddle)
+		       || (column == middle + 1 || column == middle - 1) && (row == middle + halfMiddle + 1 || row == middle - halfMiddle - 1)
+		       || (row == middle + 1 || row == middle - 1) && (column == middle + halfMiddle + 1 || column == middle - halfMiddle - 1)) {
+            premium_type = 'DL';
+	    } else if ((row == middle - 2 || row == middle + 2)
+		       && (column == middle - 2 || column == middle + 2)
+		       || (column == middle + 2 || column == middle - 2) && (row == middle + halfMiddle + 2 || row == middle - halfMiddle - 2)
+		       || (row == middle + 2 || row == middle - 2) && (column == middle + halfMiddle + 2 || column == middle - halfMiddle - 2)) {
+            premium_type = 'TL';
+	    }
+
+        return premium_type;
     }
 
     this.get_game_board = ( [letters, orientation], game_id) => {
@@ -387,12 +421,12 @@ const game_controller = () => {
         return all_words;
     }
 
-    this.calculate_move_score = (game_id, user_id, all_words) => {
+    this.calculate_move_score = (game_id, user_id, all_words, board) => {
         if(all_words) {
             let move_score = 0;
 
             all_words.forEach ( (word) => {
-                move_score += this.calculate_word_score(word);
+                move_score += this.calculate_word_score(word, board);
             }, this);
 
             console.log(move_score);
@@ -402,14 +436,29 @@ const game_controller = () => {
         }
     }
 
-    this.calculate_word_score = (word) => {
-        let score = 0;
+    this.calculate_word_score = (word, board) => {
+        let word_score = 0;
+        let word_multiplier = 1;
         
         word.forEach( (tile) => {
-            score += tile.score; 
+            let row = tile.row;
+            let column = tile.column;
+            let letter_multiplier = 1;
+
+            if(tile.is_new == 1){
+                if(board[row][column].premium == 'TW')
+                    word_multiplier *= 3;
+                if(board[row][column].premium == 'DW')
+                    word_multiplier *= 2;
+                if(board[row][column].premium == 'TL')
+                    letter_multiplier *= 3;
+                if(board[row][column].premium == 'DL')
+                    letter_multiplier *= 2;
+            }
+            word_score += (tile.score * letter_multiplier); 
         }, this);  
         
-        return score;
+        return word_score * word_multiplier;
     }
 
     this.validate_move = ( [orientation, board, word] ) => {
