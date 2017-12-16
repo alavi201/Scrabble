@@ -78,8 +78,9 @@ function play_clicked( socket ){
     return false;
 }
 
-function pass_clicked( socket ){        
-    socket.emit('pass',Array());
+function pass_clicked( socket ){      
+    let client_data = get_client_data();  
+    socket.emit('pass',client_data);
     console.log('pass move');
     $('#play').attr('disabled', true);
     $('#swap').attr('disabled', true);
@@ -253,6 +254,9 @@ function turn(next_turn_user){
     current_user_name = document.getElementById("user").value;
     if( current_user_name == next_turn_user){
         block_game_label("");
+        $('#play').removeAttr('disabled');
+        $('#swap').removeAttr('disabled');
+        $('#pass').removeAttr('disabled');
     }
     else{
         block_game_label(" It is "+next_turn_user+"'s turn")
