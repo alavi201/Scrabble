@@ -32,7 +32,6 @@ const lobby = app => {
 
         database.insert_new_game(req,res)
         .then((result) => {
-            //console.log(result.id);
             database.insert_game_user(result.id,req,res)
             res.redirect( '/game/'+ result.id);
         });
@@ -40,12 +39,10 @@ const lobby = app => {
 
     function sendGameDetails(req, res)
     {
-        //console.log( 'send game details');
-        database.get_games(req,res)
+        database.get_games_list()
         .then((data) => {
-        
-        res.render('lobby',{title:'Lobby Page',games: data, user_id: req.session.player_id, user_name: req.session.user });
-    });
+            res.render('lobby',{title:'Lobby Page',games: data, user_id: req.session.player_id, user_name: req.session.user });
+        });
     }
 
     const process_chat_message = (data, io) => {
