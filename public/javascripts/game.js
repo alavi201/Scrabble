@@ -112,6 +112,7 @@ function board_tile_clicked(){
     console.log("ROW: "+letter.row+" col: "+letter.column);
     letter.value = active_letter.val();
     active_letter.removeClass(active_letter.val().toLowerCase());
+    active_letter.removeClass('active');
     // active_letter.val("");
     // active_letter.addClass('empty');
     current_play.push(letter);
