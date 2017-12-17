@@ -11,6 +11,7 @@ function attach_sockect_events( socket ){
     socket.on('change turn', turn);
     socket.on( 'remaining tiles', show_remaining_tiles );
     socket.on( 'game started', block_game_label );
+    socket.on( 'invalid move', invalid_move );
 }
 
 function block_game_label( data ){
@@ -248,6 +249,10 @@ function display_board(board_data){
     }
 
     table.appendChild(tbody);
+}
+
+function invalid_move (message){
+    alert(message);
 }
 
 function turn(next_turn_user){

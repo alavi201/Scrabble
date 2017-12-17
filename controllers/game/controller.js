@@ -38,10 +38,12 @@ const game_controller = () => {
                 player_id_list.push(row.user_id);  
             
             }, this);
+
             player_id_list.forEach((player_id) =>{
 
                 if(player_id==user_id){
                     old_user_id_index=player_id_list.indexOf(player_id);
+
                     if(old_user_id_index+1==player_id_list.length){
                         current_user=player_id_list[0];
                         return current_user;
@@ -97,16 +99,12 @@ const game_controller = () => {
 
             res.on("end", () => {
 
-                console.log(xml_response);
-                
                 var parseString = require('xml2js').parseString;
 
                 parseString(xml_response,{ explicitArray : false }, function (err, result) {
-                    console.dir(JSON.stringify(result));
+                    //console.dir(JSON.stringify(result));
                     parsedXml = JSON.stringify(result);
                 });
-
-                console.log(parsedXml);
 
                 parsedXml = JSON.parse(parsedXml);
                 result = parsedXml.entry.scrabble;
@@ -411,7 +409,6 @@ const game_controller = () => {
                 move_score += this.calculate_word_score(word, board);
             }, this);
 
-            console.log(move_score);
             return this.update_player_score(game_id, user_id, move_score);
         } else {
             return false;
@@ -466,7 +463,7 @@ const game_controller = () => {
                     let rack_tile = new Tile( letter.xCoordinate, letter.yCoordinate, LETTER_VALUES[letter.tileId].value, LETTER_VALUES[letter.tileId].score, letter.id)
                     rack.push(rack_tile);                   
                 }, this);  
-                console.log(rack);
+                //console.log(rack);
                 return rack;
             }
             else{

@@ -23,7 +23,7 @@ const game = app => {
       controller.validate_user_with_game( user_id, game_id )
       .then( (validated) => {
         if( validated ){
-          console.log("Before add_sockets, User ID: "+user_id + " and game Id: "+ game_id);
+          //console.log("Before add_sockets, User ID: "+user_id + " and game Id: "+ game_id);
           show_page( validated, response, next, game_id, user_id, request );
         }
       });
@@ -59,16 +59,7 @@ const game = app => {
         if( is_validated ){
           //console.log("inside if validated-------------------");
           //turn function call
-          controller.get_current_turn (user_id, game_id)
-          .then( current_user_row =>{
-            if( current_user_row ){
-              controller.get_user_id( current_user_row )
-              .then( user_row => {
-                io.in(game_id).emit(CHANGE_TURN, user_row[0].username);
-                return true;
-              }) 
-            }
-          });
+          change_turn(user_id, game_id);
           controller.get_game_board( [0, 0], game_id)
           .then(board => io.in(game_id).emit( 'display board', board ));
           display_player_score(game_id);
@@ -77,6 +68,7 @@ const game = app => {
           .then( remaining_tiles_count => io.in(game_id).emit( REMAINING_TILES,remaining_tiles_count[0].count ));
         }
         else{
+          socket.emit( 'invalid move', 'Your move is invalid. Please try again');
           controller.get_game_board( [0, 0], game_id)
           .then(board => io.in(game_id).emit( 'display board', board ));
           emit_rack( socket, game_id, user_id );
@@ -94,7 +86,9 @@ const game = app => {
       return controller.swap_user_tiles( user_id, game_id, data )
       .then (swapped_tiles => {
           if(swapped_tiles) {
-            emit_rack( socket, game_id, user_id )
+            emit_rack( socket, game_id, user_id );
+            change_turn(user_id, game_id);
+            
           }
           else {
             socket.emit( INVALID_MOVE, "Swap Could Not be Completed" );
@@ -112,7 +106,7 @@ const game = app => {
     .then( data => {
       io.in( game_id ).emit(CHAT_RECEIVED, data);
     })
-    console.log('chat message: ' + data );
+    //console.log('chat message: ' + data );
   }
 
   const check_game_full = ( game, app ) => {
@@ -154,6 +148,19 @@ const game = app => {
     .then( rack => {
       socket.emit( CREATE_RACK, rack)
       return true;
+    });
+  }
+
+  const change_turn = (user_id, game_id) => {
+    controller.get_current_turn (user_id, game_id)
+    .then( current_user_row =>{
+      if( current_user_row ){
+        controller.get_user_id( current_user_row )
+        .then( user_row => {
+          io.in(game_id).emit(CHANGE_TURN, user_row[0].username);
+          return true;
+        }) 
+      }
     });
   }
 
@@ -200,16 +207,7 @@ const game = app => {
   const pass = (client_data, socket) => {
     user_id = client_data.user_id;
     game_id = client_data.game_id;
-    controller.get_current_turn (user_id, game_id)
-    .then( current_user_row =>{
-      if( current_user_row ){
-        controller.get_user_id( current_user_row )
-        .then( user_row => {
-          io.in(game_id).emit(CHANGE_TURN, user_row[0].username);
-          return true;
-        }) 
-      }
-    });
+    change_turn(user_id, game_id);
     //socket.broadcast.in( socket.room ).emit( PASS);
     //console.log('In pass event for user: '+ socket.user_id);
   }
