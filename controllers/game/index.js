@@ -59,16 +59,7 @@ const game = app => {
         if( is_validated ){
           //console.log("inside if validated-------------------");
           //turn function call
-          controller.get_current_turn (user_id, game_id)
-          .then( current_user_row =>{
-            if( current_user_row ){
-              controller.get_user_id( current_user_row )
-              .then( user_row => {
-                io.in(game_id).emit(CHANGE_TURN, user_row[0].username);
-                return true;
-              }) 
-            }
-          });
+          change_turn(user_id, game_id);
           controller.get_game_board( [0, 0], game_id)
           .then(board => io.in(game_id).emit( 'display board', board ));
           display_player_score(game_id);
@@ -94,7 +85,9 @@ const game = app => {
       return controller.swap_user_tiles( user_id, game_id, data )
       .then (swapped_tiles => {
           if(swapped_tiles) {
-            emit_rack( socket, game_id, user_id )
+            emit_rack( socket, game_id, user_id );
+            change_turn(user_id, game_id);
+            
           }
           else {
             socket.emit( INVALID_MOVE, "Swap Could Not be Completed" );
@@ -157,6 +150,19 @@ const game = app => {
     });
   }
 
+  const change_turn = (user_id, game_id) => {
+    controller.get_current_turn (user_id, game_id)
+    .then( current_user_row =>{
+      if( current_user_row ){
+        controller.get_user_id( current_user_row )
+        .then( user_row => {
+          io.in(game_id).emit(CHANGE_TURN, user_row[0].username);
+          return true;
+        }) 
+      }
+    });
+  }
+
   const emit_start_game = ( ready_to_start, game_id ) => {
     if( ready_to_start ){
       controller.get_game( game_id )
@@ -200,16 +206,7 @@ const game = app => {
   const pass = (client_data, socket) => {
     user_id = client_data.user_id;
     game_id = client_data.game_id;
-    controller.get_current_turn (user_id, game_id)
-    .then( current_user_row =>{
-      if( current_user_row ){
-        controller.get_user_id( current_user_row )
-        .then( user_row => {
-          io.in(game_id).emit(CHANGE_TURN, user_row[0].username);
-          return true;
-        }) 
-      }
-    });
+    change_turn(user_id, game_id);
     //socket.broadcast.in( socket.room ).emit( PASS);
     //console.log('In pass event for user: '+ socket.user_id);
   }
