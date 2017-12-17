@@ -29,50 +29,30 @@ const game_controller = () => {
     };
 
     this.get_current_turn = (user_id,game_id) => {
-        console.log("in get_current_turn-----------------------");
         let current_user
         let old_user_id_index
         let player_id_list=[]
         return queries.get_game_users(game_id)
         .then(data =>{
             data.forEach( (row) => {
-                console.log("in for-----------------");
-                console.log(row.user_id);
                 player_id_list.push(row.user_id);  
             
             }, this);
-            //console.log("player id list----------------------");
-            //console.log(player_id_list[0]);
-
             player_id_list.forEach((player_id) =>{
 
                 if(player_id==user_id){
-                    console.log("current user found with index-----------------");
                     old_user_id_index=player_id_list.indexOf(player_id);
-                    console.log(old_user_id_index);
-
                     if(old_user_id_index+1==player_id_list.length){
-                        console.log("current player is last player");
-                        console.log(player_id_list[0]);
                         current_user=player_id_list[0];
                         return current_user;
                     }
                     else{
-                        console.log("there are more players");
-                        console.log(player_id_list[old_user_id_index+1]);
                         current_user=player_id_list[old_user_id_index+1]
                         return current_user;
                     }
                 }
-                
             })
-            //console.log("old user index---------------------");
-            //console.log(old_user_id_index);
-            //current_user=player_id_list[old_user_id_index+1];
-            //console.log("current user-----------------------------");
-            //console.log(current_user);
             return current_user;
-            
         })
     };
 
@@ -137,15 +117,17 @@ const game_controller = () => {
     };
 
     this.get_orientation = ( letters ) => {       
-        // Check if flow is left to right
+       
         let orientation = NO_FLOW;
         var rows = letters.map( letter_obj => letter_obj.row )
-        if( this.check_all_same( rows )){
+        var cols = letters.map( letter_obj => letter_obj.column )
+
+         // Check if flow is left to right
+        if( this.check_all_same( rows ) && this.check_sequence(cols)){
             orientation = FLOW_LEFT_TO_RIGHT;
         }
         // Check if flow is top to bottom
-        var cols = letters.map( letter_obj => letter_obj.column )
-        if( this.check_all_same( cols )){
+        if( this.check_all_same( cols ) && this.check_sequence(rows)){
             orientation = FLOW_TOP_TO_BOTTOM;
         }
 
@@ -157,7 +139,7 @@ const game_controller = () => {
             let result = sequence.reduce( (a, b) => { return (a === b - 1) ? b : false });
             return (result === false) ? false : true;
         }
-         return false;   
+        return false;   
     }
 
     this.check_all_same = ( sequence ) => {
