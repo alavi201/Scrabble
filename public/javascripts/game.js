@@ -239,7 +239,7 @@ function display_board(board_data){
 	        	td.value = tile.letter.value;
 	        }
 	        else if(tile.premium != 0){
-	        	td.value = tile.premium
+	        	//td.value = tile.premium
 	        }
 	        tr.appendChild(td);
         }
