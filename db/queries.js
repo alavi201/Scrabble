@@ -97,7 +97,7 @@ const queries = database => {
     }
 
     this.get_game_user = (game_id, user_id) => {
-        return database.any('SELECT * FROM game_user WHERE "game_id" = $1 AND "user_id" = $2', [game_id, user_id])
+        return database.any('SELECT * FROM game_user WHERE "game_id" = $1 AND "user_id" = $2 ORDER BY id', [game_id, user_id])
         .then( data  => {
             return data;
         })
@@ -132,7 +132,7 @@ const queries = database => {
     }
 
     this.get_game_scores = ( game_id ) => {
-        return database.any('select username as "user_id", score from game_user join users on game_user.user_id = users.id and game_id = $1',[game_id]);
+        return database.any('select username as "user_id", score from game_user join users on game_user.user_id = users.id and game_id = $1 ORDER by game_user.user_id',[game_id]);
     }
 
     this.get_user_id = (user_id) => {
