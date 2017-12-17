@@ -8,7 +8,7 @@ block content
   h1.header_lobby LOBBY           
   .container-fluid
       
-      .col-sm-3.create-game
+      .col-sm-3.create-game.well
         form.well(method='POST' action='')
             h4 CREATE NEW GAME 
             .column
@@ -20,7 +20,19 @@ block content
                   option(value=4) 4
             .column
               button.btn.btn-primary(type='submit') Create Game
-              
+        table.table.table-striped.ongoing-games
+          thead.thead-dark
+            tr
+              th.rack.head(colspan='4') Leader Board
+              tr
+              each val in ['User','Score']
+                td.next.value= val
+          tbody
+            each row in leader_board
+              tr
+                td.game_row.value= row.username
+                td.game_row.value= row.score
+
       .col-sm-5.well(style="height:480px; overflow:scroll;")
         form(method='POST' action='/joinGame')
             table.table.table-striped.ongoing-games
@@ -35,20 +47,11 @@ block content
                   tr
                     td.game_row.value= row.creator
                     td.game_row.value=(row.players_playing + "/" + row.num_players)
-                    //- td.game_row.value=(row.status == 1 ? 'Game Already Started' : "Waiting For Players")
                     td
                       if ( row.players_playing == row.num_players)
                         p Game in Progress
                       else
                         a(href='/joinGame/'+row.id style="float:center;") JOIN
       .col-sm-4.well(style="height:480px;")
-          //- table
-          //-   thead
-          //-     tr
-          //-       th.rack.head(colspan='3') Leadership Board
-          //-   tbody
-          //-     tr
-          //-       each val in ['Name','Win%','Score']
-          //-         td.next.value= val
           h1.header_lobby CHAT
           include chat.pug

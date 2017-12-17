@@ -39,9 +39,12 @@ const lobby = app => {
 
     function sendGameDetails(req, res)
     {
-        database.get_games_list()
-        .then((data) => {
-            res.render('lobby',{title:'Lobby Page',games: data, user_id: req.session.player_id, user_name: req.session.user });
+        Promise.all([
+            database.get_games_list(),
+            database.get_leader_board()
+        ])
+        .then( ([game_list, leader_board_list]) => {
+            res.render('lobby',{title:'Lobby Page',games: game_list, user_id: req.session.player_id, user_name: req.session.user, leader_board: leader_board_list });
         });
     }
 

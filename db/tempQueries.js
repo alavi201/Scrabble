@@ -44,6 +44,12 @@ let database = function (db)  {
     group by games.id
     order by games.id desc`);
   }
+  this.get_leader_board = () => {
+    return db.any(`select (select username from users where id = user_id) as username ,sum(score) as score from game_user
+    group by user_id
+    order by score desc
+    LIMIT 5`)
+  }
 
   return this;
 }
