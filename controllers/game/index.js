@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./controller')();
-const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS, GAME_STARTED, JOINED, REMAINING_TILES, CHANGE_TURN } = require('../../constants/events');
+const { CHAT_MESSAGE, TILE, CONNECTION, DISCONNECT, INVALID_MOVE, NO_DATA, SWAP, CHAT_RECEIVED, CREATE_RACK, DISPLAY_PLAYERS, PASS, GAME_STARTED, JOINED, REMAINING_TILES, CHANGE_TURN, CANCEL } = require('../../constants/events');
 
 
 const game = app => {
@@ -212,21 +212,20 @@ const game = app => {
     //console.log('In pass event for user: '+ socket.user_id);
   }
 
+  const cancel = ( game_id, user_id, socket) => {
+
+    controller.get_game_board( [0, 0], game_id)
+    .then(board => io.in(game_id).emit( 'display board', board ));
+    
+    emit_rack( socket, game_id, user_id );
+  }
+
   io.on( CONNECTION, socket => {
     
     const on_socket_connection = (data) => {
       let game_id = data.game_id;
       let user_id = data.user_id;
-      socket.join( game_id );
-
-      //Temporary turn function call
-      /*controller.get_current_turn (user_id, game_id)
-      .then( current_user_row =>{
-        console.log("in index then---------------------");
-        io.in(game_id).emit(CHANGE_TURN,current_user_row);
-        return true;
-      });*/
-  
+      socket.join( game_id );  
       return run_socket_connected( game_id, socket, user_id);
     } 
 
@@ -248,12 +247,20 @@ const game = app => {
     const socket_pass = (data) => {
       return pass(data, socket);
     }
+
+    const socket_cancel = ( data ) => {
+      let game_id = data.game_id;
+      let user_id = data.user_id;
+
+      return cancel(game_id, user_id, socket);
+    }
     
     socket.on( JOINED, on_socket_connection );
     socket.on( CHAT_MESSAGE, socket_process_chat_message);
     socket.on( TILE, socket_validate_play);
     socket.on( SWAP, socket_swap);        
     socket.on( PASS, socket_pass);
+    socket.on( CANCEL, socket_cancel);
 
     socket.on( DISCONNECT, () => {
     }); 

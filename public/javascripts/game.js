@@ -62,6 +62,7 @@ function add_events( socket ){
     $(document).on('click', '.rack.swappable',rack_swappable_clicked);
     $(document).on('click', '.confirmation', confirmation_clicked);
     $('#pass').on('click', function(){pass_clicked(socket)});    
+    $(document).on('click', '.cancel', cancel_clicked);
 }
 
 function swap_clicked(){
@@ -98,22 +99,23 @@ function rack_letter_clicked(){
 }
     
 function board_tile_clicked(){  
-    let active_letter = $('.rack.letter.active');
-    $(this).addClass("placed_tile");
-    $(this).addClass(active_letter.val().toLowerCase());
-    $(this).val(active_letter.val());
-    $(this).off('click', board_tile_clicked);
-    let letter = new Object();
-    letter.row = $(this).data('row');
-    letter.column = $(this).data('column');
-    letter.score = $(active_letter).data('score');
-    letter.game_tile_id = $(active_letter).data('row_id');
-    console.log("ROW: "+letter.row+" col: "+letter.column);
-    letter.value = active_letter.val();
-    active_letter.removeClass(active_letter.val().toLowerCase());
-    // active_letter.val("");
-    // active_letter.addClass('empty');
-    current_play.push(letter);
+    if( ! $(this).hasClass("placed_tile" ) ){
+        let active_letter = $('.rack.letter.active');
+        $(this).addClass("placed_tile");
+        $(this).addClass(active_letter.val().toLowerCase());
+        $(this).val(active_letter.val());
+        $(this).off('click', board_tile_clicked);
+        let letter = new Object();
+        letter.row = $(this).data('row');
+        letter.column = $(this).data('column');
+        letter.score = $(active_letter).data('score');
+        letter.game_tile_id = $(active_letter).data('row_id');
+        console.log("ROW: "+letter.row+" col: "+letter.column);
+        letter.value = active_letter.val();
+        active_letter.removeClass(active_letter.val().toLowerCase());
+        active_letter.removeClass('active');
+        current_play.push(letter);
+    }
 }
    
 function tile_broadcast_received( word ){
@@ -292,4 +294,12 @@ function get_client_data (){
     data.user = document.getElementById("user").value;
     data.game_id = document.getElementById("gameId").value;
     return data;
+}
+
+function cancel_clicked(){
+    let client_data = get_client_data();
+    current_play = [];
+    tiles_to_swap = [];
+    socket.emit('cancel', client_data);
+
 }

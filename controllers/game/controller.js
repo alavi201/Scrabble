@@ -69,6 +69,16 @@ const game_controller = () => {
             return  this.find_starting_letter_accordingly(result);
         })
         .then( this.extract_word )
+        .then( result => {
+            let new_word_count = play_data.length;
+            let valid = this.check_tile_placement( result[2], new_word_count );
+            if( valid ){
+                return result;
+            }
+            else{
+                Promise.reject("Letter placement validation error");
+            }
+        })
         .then( this.validate_move )
         .then( result => this.update_game_tiles( result, play_data))
         .then( result => this.calculate_move_score(game_id, user_id, result, board))
@@ -121,11 +131,11 @@ const game_controller = () => {
         var cols = letters.map( letter_obj => letter_obj.column )
 
          // Check if flow is left to right
-        if( this.check_all_same( rows ) && this.check_sequence(cols)){
+        if( this.check_all_same( rows ) ){
             orientation = FLOW_LEFT_TO_RIGHT;
         }
         // Check if flow is top to bottom
-        if( this.check_all_same( cols ) && this.check_sequence(rows)){
+        if( this.check_all_same( cols ) ){
             orientation = FLOW_TOP_TO_BOTTOM;
         }
 
@@ -668,6 +678,21 @@ const game_controller = () => {
 
     this.get_user_id = (user_id) =>{
         return queries.get_user_id(user_id);
+    }
+
+    this.check_tile_placement = (word, new_tile_count) => {
+        let count = 0;
+        word.forEach( (tile) =>{
+            if( tile.is_new == 1 ){
+                count++;
+            }
+        })
+        if( count == new_tile_count ){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
     
     return this;
