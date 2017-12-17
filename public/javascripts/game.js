@@ -59,6 +59,7 @@ function add_events( socket ){
     $(document).on('click', '.rack.swappable',rack_swappable_clicked);
     $(document).on('click', '.confirmation', confirmation_clicked);
     $('#pass').on('click', function(){pass_clicked(socket)});    
+    $(document).on('click', '.cancel', cancel_clicked);
 }
 
 function swap_clicked(){
@@ -282,4 +283,12 @@ function get_client_data (){
     data.user = document.getElementById("user").value;
     data.game_id = document.getElementById("gameId").value;
     return data;
+}
+
+function cancel_clicked(){
+    let client_data = get_client_data();
+    current_play = [];
+    tiles_to_swap = [];
+    socket.emit('cancel', client_data);
+
 }
