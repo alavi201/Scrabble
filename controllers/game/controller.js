@@ -314,7 +314,7 @@ const game_controller = () => {
 
        //row is fixed, increment column till we hit a blank tile on the board or the end
         if( orientation === FLOW_LEFT_TO_RIGHT ){
-            while(board[row][column].letter != 0 && column < 16) {
+            while(column < 16 && board[row][column].letter != 0 ) {
                 board_tile = board[row][column];
                 tile = board_tile.letter;
                 word.push( tile );
@@ -328,7 +328,7 @@ const game_controller = () => {
 
        //row is fixed, increment row till we hit a blank tile on the board or the end
         if( orientation === FLOW_TOP_TO_BOTTOM ){
-            while(board[row][column].letter != 0 && row < 16) {
+            while(row < 16 && board[row][column].letter != 0 ) {
                 board_tile = board[row][column];
                 tile = board_tile.letter;
                 word.push( tile );
@@ -460,17 +460,39 @@ const game_controller = () => {
         }
         let center_tile = board[8][8].letter;
 
-        let touching_tiles = this.get_touching_tiles([ orientation, board, word ]);
-        if( center_tile.is_new != true){
-            if( touching_tiles.length <=  0 ) {
-                return false;
-            }
+        let is_touching_tile = this.is_touching_tiles([ orientation, board, word ]);
+        if( center_tile.is_new != true && !is_touching_tile){
+            return false;
         }
+        let touching_tiles = this.get_touching_tiles([ orientation, board, word ]);
         let touching_words = this.get_touching_words( [orientation, board, touching_tiles] );
         touching_words.push( word );
 
         return validate_all_words( touching_words );
 
+    }
+
+    this.is_touching_tiles = ([ orientation, board, word ]) => {
+        
+        let touching_tiles = [];
+ 
+        word.forEach( (tile) => {
+          
+            if(orientation == FLOW_LEFT_TO_RIGHT){
+                if((tile.row > 1 && board[tile.row -1][tile.column].letter !=0) || (tile.row < 15 && board[tile.row + 1][tile.column].letter !=0)){
+                    touching_tiles.push(tile);
+                }
+            }
+ 
+            if(orientation == FLOW_TOP_TO_BOTTOM){
+                if((tile.column > 1 && board[tile.row][tile.column - 1].letter !=0) || (tile.column < 15 && board[tile.row][tile.column + 1].letter !=0)){
+                    touching_tiles.push(tile);
+                }
+            }
+ 
+        }, this);
+        
+        return (touching_tiles.length > 0);
     }
 
     this.get_player_rack = ([user_id, game_id] ) => {
