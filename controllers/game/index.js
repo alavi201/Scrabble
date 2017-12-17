@@ -23,7 +23,7 @@ const game = app => {
       controller.validate_user_with_game( user_id, game_id )
       .then( (validated) => {
         if( validated ){
-          console.log("Before add_sockets, User ID: "+user_id + " and game Id: "+ game_id);
+          //console.log("Before add_sockets, User ID: "+user_id + " and game Id: "+ game_id);
           show_page( validated, response, next, game_id, user_id, request );
         }
       });
@@ -106,7 +106,7 @@ const game = app => {
     .then( data => {
       io.in( game_id ).emit(CHAT_RECEIVED, data);
     })
-    console.log('chat message: ' + data );
+    //console.log('chat message: ' + data );
   }
 
   const check_game_full = ( game, app ) => {

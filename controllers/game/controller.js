@@ -29,48 +29,32 @@ const game_controller = () => {
     };
 
     this.get_current_turn = (user_id,game_id) => {
-        console.log("in get_current_turn-----------------------");
         let current_user
         let old_user_id_index
         let player_id_list=[]
         return queries.get_game_users(game_id)
         .then(data =>{
             data.forEach( (row) => {
-                console.log("in for-----------------");
-                console.log(row.user_id);
                 player_id_list.push(row.user_id);  
             
             }, this);
-            //console.log("player id list----------------------");
-            //console.log(player_id_list[0]);
 
             player_id_list.forEach((player_id) =>{
 
                 if(player_id==user_id){
-                    console.log("current user found with index-----------------");
                     old_user_id_index=player_id_list.indexOf(player_id);
-                    console.log(old_user_id_index);
-
+                    
                     if(old_user_id_index+1==player_id_list.length){
-                        console.log("current player is last player");
-                        console.log(player_id_list[0]);
                         current_user=player_id_list[0];
                         return current_user;
                     }
                     else{
-                        console.log("there are more players");
-                        console.log(player_id_list[old_user_id_index+1]);
                         current_user=player_id_list[old_user_id_index+1]
                         return current_user;
                     }
                 }
                 
             })
-            //console.log("old user index---------------------");
-            //console.log(old_user_id_index);
-            //current_user=player_id_list[old_user_id_index+1];
-            //console.log("current user-----------------------------");
-            //console.log(current_user);
             return current_user;
             
         })
@@ -117,16 +101,12 @@ const game_controller = () => {
 
             res.on("end", () => {
 
-                console.log(xml_response);
-                
                 var parseString = require('xml2js').parseString;
 
                 parseString(xml_response,{ explicitArray : false }, function (err, result) {
-                    console.dir(JSON.stringify(result));
+                    //console.dir(JSON.stringify(result));
                     parsedXml = JSON.stringify(result);
                 });
-
-                console.log(parsedXml);
 
                 parsedXml = JSON.parse(parsedXml);
                 result = parsedXml.entry.scrabble;
@@ -429,7 +409,6 @@ const game_controller = () => {
                 move_score += this.calculate_word_score(word, board);
             }, this);
 
-            console.log(move_score);
             return this.update_player_score(game_id, user_id, move_score);
         } else {
             return false;
@@ -484,7 +463,7 @@ const game_controller = () => {
                     let rack_tile = new Tile( letter.xCoordinate, letter.yCoordinate, LETTER_VALUES[letter.tileId].value, LETTER_VALUES[letter.tileId].score, letter.id)
                     rack.push(rack_tile);                   
                 }, this);  
-                console.log(rack);
+                //console.log(rack);
                 return rack;
             }
             else{

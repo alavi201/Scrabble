@@ -36,7 +36,7 @@ const joinGame = app => {
           }
         });
 
-        console.log('in get join game');
+        //console.log('in get join game');
         
           
     });
