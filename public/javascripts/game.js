@@ -36,6 +36,9 @@ function block_game_label( data ){
 function show_remaining_tiles( remaining_tiles ){
     let tile_count = document.getElementById('tile_count');
     tile_count.innerText = remaining_tiles;
+    
+    if(remaining_tiles <= 75)
+        end_game('Game Over');
 }
 
 function swap_received(swapped_tiles){
@@ -255,6 +258,13 @@ function invalid_move (message){
     alert(message);
 }
 
+function end_game(message){
+    block_game_label(message);
+    $('#play').remove();
+    $('#swap').remove();
+    $('#pass').remove();
+}
+
 function turn(next_turn_user){
     current_user_name = document.getElementById("user").value;
     if( current_user_name == next_turn_user){
@@ -264,7 +274,7 @@ function turn(next_turn_user){
         $('#pass').removeAttr('disabled');
     }
     else{
-        block_game_label(" It is "+next_turn_user+"'s turn")
+        block_game_label(" It is "+next_turn_user+"'s turn");
     }
 }
 
