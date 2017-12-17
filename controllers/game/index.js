@@ -68,6 +68,7 @@ const game = app => {
           .then( remaining_tiles_count => io.in(game_id).emit( REMAINING_TILES,remaining_tiles_count[0].count ));
         }
         else{
+          socket.emit( 'invalid move', 'Your move is invalid. Please try again');
           controller.get_game_board( [0, 0], game_id)
           .then(board => io.in(game_id).emit( 'display board', board ));
           emit_rack( socket, game_id, user_id );
