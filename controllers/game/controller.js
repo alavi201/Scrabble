@@ -121,11 +121,11 @@ const game_controller = () => {
         var cols = letters.map( letter_obj => letter_obj.column )
 
          // Check if flow is left to right
-        if( this.check_all_same( rows ) && this.check_sequence(cols)){
+        if( this.check_all_same( rows ) ){
             orientation = FLOW_LEFT_TO_RIGHT;
         }
         // Check if flow is top to bottom
-        if( this.check_all_same( cols ) && this.check_sequence(rows)){
+        if( this.check_all_same( cols ) ){
             orientation = FLOW_TOP_TO_BOTTOM;
         }
 
