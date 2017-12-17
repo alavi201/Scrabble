@@ -32,14 +32,23 @@ let database = function (db)  {
     })
   }
 
-  this.get_games = (req,res) =>{
-    return db.any("select users.username as creator, games.* from users , games where games.creator_id = users.id");
-  }
-
   this.insert_game_user = (gameId,req,res) =>{
     const date=new Date();
     return db.any(`INSERT INTO game_user ("user_id","game_id","score","is_spectator","updated_at") 
     VALUES ($1,$2,0,0,$3)`,[req.session.player_id,gameId,date])
+  }
+
+  this.get_games_list = () => {
+    return db.any( `select games.id, (select username from users where users.id = creator_id) as creator ,num_players , count(game_user.id) as "players_playing" from games 
+    join game_user on game_user.game_id = games.id
+    group by games.id
+    order by games.id desc`);
+  }
+  this.get_leader_board = () => {
+    return db.any(`select (select username from users where id = user_id) as username ,sum(score) as score from game_user
+    group by user_id
+    order by score desc
+    LIMIT 5`)
   }
 
   return this;
