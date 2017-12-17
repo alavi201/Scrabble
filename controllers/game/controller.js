@@ -451,12 +451,21 @@ const game_controller = () => {
     }
 
     this.validate_move = ( [orientation, board, word] ) => {
+        
+        let is_valid = false;
+        let center_letter_filled = (board[8][8].letter != 0);
 
-        if(board[8][8].letter == 0)
-            return false;
+        if( !center_letter_filled ){
+            return is_valid;
+        }
+        let center_tile = board[8][8].letter;
 
         let touching_tiles = this.get_touching_tiles([ orientation, board, word ]);
-
+        if( center_tile.is_new != true){
+            if( touching_tiles.length <=  0 ) {
+                return false;
+            }
+        }
         let touching_words = this.get_touching_words( [orientation, board, touching_tiles] );
         touching_words.push( word );
 
