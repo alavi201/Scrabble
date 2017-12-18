@@ -139,6 +139,19 @@ const queries = database => {
         return database.any( "select * from users where id = $1",[user_id]);
     }
 
+    this.get_game_stats = (user_id) => {
+        return database.any( "select * from game_user where user_id = $1",[user_id]);
+    }
+    
+    this.get_avg_score = (user_id) => {
+        return database.any( "select cast(avg(score) as decimal(10,2)) from game_user where id = $1",[user_id]);
+    }
+
+    this.update_password = (req,res) => {
+        return database.none( "Update users set password=$1 where id = $2",[req.body.new_password,req.session.player_id]);
+    }
+    
+
     return this;
 };
 module.exports = queries;
