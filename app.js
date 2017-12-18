@@ -38,6 +38,7 @@ var help = require('./controllers/help')(app);
 var about = require('./controllers/about')(app);
 var termsConditions = require('./controllers/termsConditions')(app);
 var joinGame = require('./controllers/joinGame')(app);
+var account = require('./controllers/account')(app);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -62,6 +63,7 @@ app.use('/help',help);
 app.use('/about',about);
 app.use('/termsConditions',termsConditions);
 app.use('/joinGame',joinGame);
+app.use('/account',account);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
