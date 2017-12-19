@@ -2,57 +2,53 @@ extends layout
 
 block content   
   
+     .container-fluid
+        h1.header_lobby My Account 
+        .col-sm-6.well
+            .col-sm-6.create-game.well
+                form.well(method='POST' action='' style="height:220px;")
+                    h4 Your Account Settings
+                    .column
+                        |Username :
+                        |&nbsp;
+                        |#{user[0].username}
+                    .column
+                        |Email Address :
+                        |&nbsp;
+                        |#{user[0].email}
+                    .column
+                        |Name :
+                        |&nbsp;
+                        |#{user[0].name}
+                    
 
-  h1.header_lobby My Account 
-  .col-sm-5.well(style="width: 1500px;height: 200px;position:absolute;")
-    form(method='POST' action='')
-        h4 Your Account Settings
-        .column
-            |Username :
-            |&nbsp;
-            |#{user[0].name}
-        .column
-            |Password :
-            |&nbsp;
-            a(href='') Reset Password
-        .column
-            |Email Address :
-            |&nbsp;
-            |#{user[0].email}
-    
+            .col-sm-6.create-game.well
+                form.well(method='POST' action='' style="height:220px;")
+                    h4 Reset Password
+                    .column
+                        input(type="password", name="old_password", placeholder="Old Password") 
+                        input(type="password", name="new_password", placeholder="New Password") 
+
+                        button.btn.btn-primary(type="submit") Reset
             
-    .col-sm-6.well(style="width: 600px;height: 200px;")
-        form(method='POST' action='')
-            h4 Your Game Stats
-            .column
+            .col-sm-12.create-game.well(style="border: 1px solid black; height: 120px;")
+
+                h4 Your Game Stats
                 |Average score: :
                 |&nbsp;
                 |#{avgScore[0].avg}
-    
-    .col-sm-5.well(style="height:480px; left:50px; overflow:scroll;")
-        
-        table.table.table-striped.ongoing-games
-            thead.thead-dark
-                tr
-                th.rack.head(colspan='4') Games Played
-                tr
-                    each val in ['Game Id','Your Score','Date Played']
-                        td.next.value= val 
-            tbody
-                each row in game
-                    tr
-                        td.game_row.value= row.game_id
-                        td.game_row.value= row.score
-                        td.game_row.value= row.updated_at
-  .col-sm-5.well(style="width: 300px;height: 200px;left: 900px;position:absolute;")
-    form(method='POST' action='')
-        h4 Reset Password
-        .column
-            input(type="password", name="old_password", placeholder="Old Password") 
-        .column
-            input(type="password", name="new_password", placeholder="New Password") 
-        .column
-            input(type="submit", value="Reset")
 
-            
-                
+        .col-sm-6.well(style="height:480px; overflow:scroll;")
+            table.table.table-striped.ongoing-games
+                thead.thead-dark
+                    tr
+                        th.rack.head(colspan='3') Games Played
+                        tr
+                        each val in ['Game Id','Your Score','Date Played']
+                            td.next.value= val 
+                tbody
+                    each row in game
+                        tr
+                            td.game_row.value= row.game_id
+                            td.game_row.value= row.score
+                            td.game_row.value= row.updated_at

@@ -26,10 +26,6 @@ server.on('listening', onListening);
 
 app.io = initSocket;
 
-
-
-
-
 var game = require('./controllers/game/index')(app);
 var login = require('./controllers/login')(app);
 var lobby = require('./controllers/lobby')(app);
@@ -125,8 +121,4 @@ function onListening() {
   console.log('Listening on ' + bind);
 }
 
-
 module.exports = app;
-
-
-
