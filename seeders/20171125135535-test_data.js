@@ -29,7 +29,6 @@ module.exports = {
       { id: 24, score: 8, letter: "X" ,count:1},
       { id: 25, score: 4, letter: "Y" ,count:2},
       { id: 26, score: 10, letter: "Z" ,count:1},
-      { id: 27, score: 0, letter: " " ,count:1},
     ], {})
   },
 
