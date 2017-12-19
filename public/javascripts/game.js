@@ -37,7 +37,7 @@ function show_remaining_tiles( remaining_tiles ){
     let tile_count = document.getElementById('tile_count');
     tile_count.innerText = remaining_tiles;
     
-    if(remaining_tiles <= 55)
+    if(remaining_tiles <= 0)
         end_game('Game Over');
 }
 
